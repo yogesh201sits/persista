@@ -1,15 +1,22 @@
 {
   "name": "@persista/database",
   "version": "0.1.0",
-  "private": true,
-  "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "private": true,
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target=node",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "prisma generate --schema prisma/schema.prisma",
+    "migrate": "prisma migrate dev --schema prisma/schema.prisma",
+    "studio": "prisma studio --schema prisma/schema.prisma",
+    "push": "prisma db push --schema prisma/schema.prisma"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@prisma/adapter-neon": "^7.9.1"
   }
 }
