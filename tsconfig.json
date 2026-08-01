@@ -1,30 +1,38 @@
 {
   "compilerOptions": {
-    // Environment setup & latest features
-    "lib": ["ESNext"],
-    "target": "ESNext",
-    "module": "Preserve",
-    "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "strict": true,
+
+    "esModuleInterop": true,
+
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
+
+    "allowSyntheticDefaultImports": true,
+
+    "forceConsistentCasingInFileNames": true,
+
+    "isolatedModules": true,
+
     "types": ["bun"],
 
-    // Bundler mode
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "baseUrl": ".",
 
-    // Best practices
-    "strict": true,
-    "skipLibCheck": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-
-    // Some stricter flags (disabled by default)
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "paths": {
+      "@persista/shared": ["packages/shared/src"],
+      "@persista/core": ["packages/core/src"],
+      "@persista/sdk": ["packages/sdk/src"],
+      "@persista/database": ["packages/database/src"],
+      "@persista/vector-store": ["packages/vector-store/src"],
+      "@persista/extractor": ["packages/extractor/src"],
+      "@persista/embeddings": ["packages/embeddings/src"],
+      "@persista/providers": ["packages/providers/src"],
+      "@persista/ranking": ["packages/ranking/src"],
+      "@persista/graph": ["packages/graph/src"]
+    }
   }
 }
