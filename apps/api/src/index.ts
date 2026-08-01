@@ -1,12 +1,10 @@
-import { Hono } from "hono";
+import app from "./app";
+import { env } from "./config/env";
+import { logger } from "./middleware/logger";
 
-const app = new Hono();
-
-app.get("/", (c) => {
-  return c.text("Persista API");
-});
+logger.info("Starting Persista API");
 
 export default {
-  port: Number(3000),
+  port: env.PORT||3000,
   fetch: app.fetch,
 };

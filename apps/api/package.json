@@ -8,5 +8,8 @@
   },
   "dependencies": {
     "hono": "^4.12.33"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2"
   }
 }
