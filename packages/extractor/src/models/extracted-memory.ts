@@ -3,12 +3,19 @@ export interface ExtractedMemory {
 
   type:
     | "fact"
-    | "preference"
     | "identity"
+    | "preference"
     | "goal"
     | "relationship";
 
   confidence: number;
+
+  /**
+   * Structured value extracted from the content.
+   * Example:
+   * "My name is Yogesh" -> "Yogesh"
+   */
+  value?: string;
 
   metadata?: Record<string, unknown>;
 }
