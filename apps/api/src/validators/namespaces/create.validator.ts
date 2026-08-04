@@ -12,6 +12,4 @@ export const createNamespaceSchema = z.object({
     }),
 });
 
-export type CreateNamespaceInput = z.infer<
-  typeof createNamespaceSchema
->;
+export type CreateNamespaceInput = z.infer<typeof createNamespaceSchema>;

@@ -9,8 +9,5 @@ export interface VectorStore {
 
   delete(id: string): Promise<void>;
 
-  search(
-    embedding: number[],
-    limit: number,
-  ): Promise<SearchResult[]>;
+  search(embedding: number[], limit: number): Promise<SearchResult[]>;
 }

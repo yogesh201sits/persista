@@ -1,1 +1,1 @@
-export * from "./metadata.validator"
+export * from "./metadata.validator";

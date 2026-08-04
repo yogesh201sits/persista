@@ -10,8 +10,14 @@
     "concurrently": "^10.0.4",
     "prisma": "^7.9.1"
   },
-   "prisma": {
+  "prisma": {
     "schema": "packages/database/prisma/schema.prisma"
+  },
+  "scripts": {
+    "format": "biome format . --write",
+    "lint": "biome lint .",
+    "check": "biome check .",
+    "check:fix": "biome check . --write"
   },
   "peerDependencies": {
     "typescript": "^7.0.2"

@@ -7,11 +7,8 @@ export const updateSchema = z
     content: z.string().trim().min(1).optional(),
     metadata: metadataSchema.optional(),
   })
-  .refine(
-    (data) => data.content !== undefined || data.metadata !== undefined,
-    {
-      message: "At least one field must be provided.",
-    },
-  );
+  .refine((data) => data.content !== undefined || data.metadata !== undefined, {
+    message: "At least one field must be provided.",
+  });
 
 export type UpdateInput = z.infer<typeof updateSchema>;

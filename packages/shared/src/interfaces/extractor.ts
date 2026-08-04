@@ -1,10 +1,5 @@
-import type {
-  Conversation,
-  Memory,
-} from "../types";
+import type { Conversation, Memory } from "../types";
 
 export interface Extractor {
-  extract(
-    conversation: Conversation,
-  ): Promise<Memory[]>;
+  extract(conversation: Conversation): Promise<Memory[]>;
 }

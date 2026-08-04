@@ -5,6 +5,4 @@ export const listNamespacesSchema = z.object({
   cursor: z.string().optional(),
 });
 
-export type ListNamespacesInput = z.infer<
-  typeof listNamespacesSchema
->;
+export type ListNamespacesInput = z.infer<typeof listNamespacesSchema>;

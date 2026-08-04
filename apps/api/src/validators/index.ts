@@ -1,3 +1,3 @@
 export * from "./common";
 export * from "./memories";
-export * from "./namespaces"
+export * from "./namespaces";
