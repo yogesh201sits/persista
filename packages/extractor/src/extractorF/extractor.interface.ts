@@ -1,5 +1,6 @@
-import type { ExtractionResult } from "../models";
+import type { Conversation } from "@persista/shared";
+import type { ExtractedMemory } from "../models";
 
 export interface Extractor {
-  extract(text: string): Promise<ExtractionResult>;
+  extract(conversation: Conversation): Promise<ExtractedMemory[]>;
 }
