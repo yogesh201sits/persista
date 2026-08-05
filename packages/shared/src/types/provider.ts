@@ -2,7 +2,7 @@ export type EmbeddingProviderType =
   | "openai"
   | "ollama"
   | "voyage"
-  | "cohere"
+  | "huggingface"
   | "custom";
 
 export type VectorStoreType =
