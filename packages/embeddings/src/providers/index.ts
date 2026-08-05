@@ -1,1 +1,1 @@
-// export * from "./fastembed.provider";
+export * from "./huggingface.provider";
