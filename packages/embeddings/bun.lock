@@ -1,0 +1,19 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "@persista/embeddings",
+      "dependencies": {
+        "@huggingface/inference": "^4.13.24",
+      },
+    },
+  },
+  "packages": {
+    "@huggingface/inference": ["@huggingface/inference@4.13.24", "", { "dependencies": { "@huggingface/jinja": "^0.5.9", "@huggingface/tasks": "^0.21.32" } }, "sha512-OIzmaX0TW3JkfZyV7mbiZLK9uv5xj0smo06l2BUM6zrXoeELP8CE3LPZ37ln4URsOnhnHJxWQHEexknlHJqyyA=="],
+
+    "@huggingface/jinja": ["@huggingface/jinja@0.5.9", "", {}, "sha512-uWTG+l3VJRsl7EXxYizuL3P+cCPoc3cRqbWWRcQN0FhejRfbdq0RNhCmbY/YDtnTcz9icdLYuLDjsnz4d8JMuw=="],
+
+    "@huggingface/tasks": ["@huggingface/tasks@0.21.33", "", {}, "sha512-efQa8g+WjPwzlwk7Wl4eDgbM1Jq+WooUw/b1+eKl2LVUdPMhnbwsFNMJJxhEywaLJvJBy93+jjna6855U9GePw=="],
+  }
+}
