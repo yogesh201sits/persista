@@ -1,7 +1,7 @@
 export type EmbeddingProviderType =
   | "openai"
   | "ollama"
-  | "voyage"
+  | "fastembed"
   | "huggingface"
   | "custom";
 

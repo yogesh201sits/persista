@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@huggingface/inference": "^4.13.24"
+    "@huggingface/inference": "^4.13.24",
+    "fastembed": "^2.1.0"
   }
 }
