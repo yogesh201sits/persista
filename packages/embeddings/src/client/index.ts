@@ -1,1 +1,1 @@
-export * from "./embedding-client";
+export * from "./embedding.client";
