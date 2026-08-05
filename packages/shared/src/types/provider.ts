@@ -3,6 +3,8 @@ export type EmbeddingProviderType =
   | "ollama"
   | "fastembed"
   | "huggingface"
+  | "voyage"
+  | "cohere"
   | "custom";
 
 export type VectorStoreType =
