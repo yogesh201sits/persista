@@ -11,5 +11,9 @@
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target=node",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.24",
+    "fastembed": "^2.1.0"
   }
 }
