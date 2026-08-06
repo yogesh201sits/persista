@@ -11,5 +11,8 @@
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target=node",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@qdrant/js-client-rest": "^1.19.0"
   }
 }
