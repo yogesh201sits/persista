@@ -23,7 +23,7 @@ export class QdrantClient {
     const collections = await this.client.getCollections();
 
     const exists = collections.collections.some(
-      (c) => c.name === this.options.collection,
+      (collection) => collection.name === this.options.collection,
     );
 
     if (exists) {
@@ -72,7 +72,7 @@ export class QdrantClient {
     vector: number[],
     limit = 10,
   ) {
-    return this.client.query(this.options.collection, {
+    return await this.client.query(this.options.collection, {
       query: vector,
       limit,
       with_payload: true,
