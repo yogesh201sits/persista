@@ -19,6 +19,11 @@ import type {
   MemoryManager,
 } from "./memory-manager";
 
+import type {
+  VectorSearchOptions,
+  VectorSearchResult,
+} from "@persista/vector-store";
+
 export class DefaultMemoryManager
   implements MemoryManager {
 
@@ -28,6 +33,21 @@ export class DefaultMemoryManager
     private readonly vectorStore: VectorStore,
   ) {}
 
+  async search(
+  namespace: string,
+  query: string,
+  options?: VectorSearchOptions,
+): Promise<VectorSearchResult[]> {
+  const embedding =
+    await this.embeddingProvider.embed(query);
+
+  return this.vectorStore.search(
+    embedding,
+    {
+      ...options,
+    },
+  );
+}
   async remember(
     namespace: string,
     conversation: Conversation,
@@ -78,6 +98,7 @@ export class DefaultMemoryManager
           ...(memory.metadata ?? {}),
         },
       });
+      
     }
 
     await this.vectorStore.upsertBatch(

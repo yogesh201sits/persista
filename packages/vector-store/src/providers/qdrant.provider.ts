@@ -77,8 +77,7 @@ export class QdrantVectorStore implements VectorStore {
     return result.points.map((point) => ({
       id: String(point.id),
       score: point.score,
-      metadata:
-        (point.payload as Record<string, unknown>) ?? {},
+      metadata: point.payload as VectorSearchResult["metadata"],
     }));
   }
 
