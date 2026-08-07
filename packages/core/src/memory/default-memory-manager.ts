@@ -34,20 +34,17 @@ export class DefaultMemoryManager
   ) {}
 
   async search(
-  namespace: string,
-  query: string,
-  options?: VectorSearchOptions,
-): Promise<VectorSearchResult[]> {
-  const embedding =
-    await this.embeddingProvider.embed(query);
+    query: string,
+    options?: VectorSearchOptions,
+  ): Promise<VectorSearchResult[]> {
+    const embedding =
+      await this.embeddingProvider.embed(query);
 
-  return this.vectorStore.search(
-    embedding,
-    {
-      ...options,
-    },
-  );
-}
+    return this.vectorStore.search(
+      embedding,
+      options,
+    );
+  }
   async remember(
     namespace: string,
     conversation: Conversation,
