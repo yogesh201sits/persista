@@ -1,0 +1,87 @@
+import type {
+  Conversation,
+} from "@persista/shared";
+
+import type {
+  EmbeddingProvider,
+} from "@persista/shared";
+
+import type {
+  VectorStore,
+  VectorMemory,
+} from "@persista/vector-store";
+
+import type {
+  Extractor,
+} from "@persista/extractor";
+
+import type {
+  MemoryManager,
+} from "./memory-manager";
+
+export class DefaultMemoryManager
+  implements MemoryManager {
+
+  constructor(
+    private readonly extractor: Extractor,
+    private readonly embeddingProvider: EmbeddingProvider,
+    private readonly vectorStore: VectorStore,
+  ) {}
+
+  async remember(
+    namespace: string,
+    conversation: Conversation,
+  ): Promise<void> {
+
+    const result =
+      await this.extractor.extract(
+        conversation,
+      );
+
+    if (result.memories.length === 0) {
+      return;
+    }
+
+    const texts = result.memories.map(
+      (memory) => memory.content,
+    );
+
+    const embeddings =
+      await this.embeddingProvider.embedBatch(
+        texts,
+      );
+
+    const vectorMemories: VectorMemory[] = [];
+
+    for (let i = 0; i < result.memories.length; i++) {
+
+      const memory = result.memories[i];
+
+      vectorMemories.push({
+        id: crypto.randomUUID(),
+
+        namespace,
+
+        embedding: embeddings[i],
+
+        metadata: {
+          content: memory.content,
+
+          type: memory.type,
+
+          confidence: memory.confidence,
+
+          ...(memory.value !== undefined
+            ? { value: memory.value }
+            : {}),
+
+          ...(memory.metadata ?? {}),
+        },
+      });
+    }
+
+    await this.vectorStore.upsertBatch(
+      vectorMemories,
+    );
+  }
+}
