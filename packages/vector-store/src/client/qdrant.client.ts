@@ -79,7 +79,7 @@ export class QdrantClient {
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string | number): Promise<void> {
     await this.client.delete(this.options.collection, {
       wait: true,
       points: [id],
