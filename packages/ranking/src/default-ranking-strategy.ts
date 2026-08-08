@@ -12,35 +12,70 @@ export class DefaultRankingStrategy
   rank(
     results: VectorSearchResult[],
   ): VectorSearchResult[] {
+    const now = Date.now();
+
     return [...results].sort(
       (a, b) => {
-        let confidenceA = 1;
-        let confidenceB = 1;
-
-        if (
-          a.metadata !== undefined &&
-          typeof a.metadata.confidence === "number"
-        ) {
-          confidenceA =
-            a.metadata.confidence;
-        }
-
-        if (
-          b.metadata !== undefined &&
-          typeof b.metadata.confidence === "number"
-        ) {
-          confidenceB =
-            b.metadata.confidence;
-        }
-
         const scoreA =
-          a.score * confidenceA;
+          this.calculateScore(a, now);
 
         const scoreB =
-          b.score * confidenceB;
+          this.calculateScore(b, now);
 
         return scoreB - scoreA;
       },
+    );
+  }
+
+  private calculateScore(
+    result: VectorSearchResult,
+    now: number,
+  ): number {
+    const similarity =
+      result.score;
+
+    let confidence = 1;
+
+    if (
+      result.metadata !== undefined &&
+      typeof result.metadata.confidence ===
+        "number"
+    ) {
+      confidence =
+        result.metadata.confidence;
+    }
+
+    let recency = 1;
+
+    if (
+      result.metadata !== undefined &&
+      typeof result.metadata.createdAt ===
+        "string"
+    ) {
+      const createdAt =
+        new Date(
+          result.metadata.createdAt,
+        ).getTime();
+
+      if (!Number.isNaN(createdAt)) {
+        const age =
+          Math.max(
+            0,
+            now - createdAt,
+          );
+
+        const day =
+          1000 * 60 * 60 * 24;
+
+        recency =
+          1 / (1 + age / day);
+      }
+    }
+
+    return (
+      similarity * 0.6 +
+      confidence * 0.2 +
+      recency * 0.2
     );
   }
 }
