@@ -142,3 +142,43 @@ describe("LLMExtractor", () => {
     );
   });
 });
+test("should reject invalid memory type", async () => {
+  const llm: LLMProvider = {
+    generate: mock(async () =>
+      JSON.stringify([
+        {
+          content: "I prefer TypeScript.",
+          type: "invalid-type",
+          confidence: 0.95,
+          value: "TypeScript",
+        },
+      ]),
+    ),
+  };
+
+  const extractor = new LLMExtractor(llm);
+
+  expect(
+    extractor.extract(["I prefer TypeScript."]),
+  ).rejects.toThrow();
+});
+test("should reject invalid confidence", async () => {
+  const llm: LLMProvider = {
+    generate: mock(async () =>
+      JSON.stringify([
+        {
+          content: "I prefer TypeScript.",
+          type: "preference",
+          confidence: 2,
+          value: "TypeScript",
+        },
+      ]),
+    ),
+  };
+
+  const extractor = new LLMExtractor(llm);
+
+  expect(
+    extractor.extract(["I prefer TypeScript."]),
+  ).rejects.toThrow();
+});

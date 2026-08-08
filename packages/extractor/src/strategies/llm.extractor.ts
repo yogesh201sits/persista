@@ -1,5 +1,6 @@
 import type { ExtractedMemory } from "../models";
 import type { LLMProvider } from "../providers/llm-provider";
+import { extractedMemoriesSchema } from "../schemas/extracted-memory.schema";
 import type { ExtractorStrategy } from "./extractor-strategy";
 
 export class LLMExtractor implements ExtractorStrategy {
@@ -16,12 +17,15 @@ export class LLMExtractor implements ExtractorStrategy {
 
     const prompt = this.buildPrompt(sentences);
 
-    const response = await this.llm.generate(prompt);
+    const response =
+      await this.llm.generate(prompt);
 
     return this.parseResponse(response);
   }
 
-  private buildPrompt(sentences: string[]): string {
+  private buildPrompt(
+    sentences: string[],
+  ): string {
     return `
 Extract meaningful memories from the following sentences.
 
@@ -52,12 +56,6 @@ ${sentences.join("\n")}
   ): ExtractedMemory[] {
     const parsed: unknown = JSON.parse(response);
 
-    if (!Array.isArray(parsed)) {
-      throw new Error(
-        "LLM extractor expected an array",
-      );
-    }
-
-    return parsed as ExtractedMemory[];
+    return extractedMemoriesSchema.parse(parsed);
   }
 }
