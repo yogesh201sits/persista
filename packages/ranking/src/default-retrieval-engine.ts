@@ -27,9 +27,19 @@ export class DefaultRetrievalEngine
     const embedding =
       await this.embeddingProvider.embed(query);
 
-    return this.vectorStore.search(
-      embedding,
-      options,
+    const results =
+      await this.vectorStore.search(
+        embedding,
+        options,
+      );
+
+    if (options?.minScore === undefined) {
+      return results;
+    }
+
+    return results.filter(
+      (result) =>
+        result.score >= options.minScore!,
     );
   }
 }

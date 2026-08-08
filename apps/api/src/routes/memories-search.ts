@@ -9,12 +9,14 @@ import {
 
 const memoriesSearch = new Hono();
 
-memoriesSearch.post("/",
+memoriesSearch.post(
+  "/",
   validateBody(memorySearchRequestSchema),
   async (c) => {
     const body = c.get("body") as {
       query: string;
       limit?: number;
+      minScore?: number;
     };
 
     const results =
@@ -22,6 +24,7 @@ memoriesSearch.post("/",
         body.query,
         {
           limit: body.limit ?? 10,
+          minScore: body.minScore,
         },
       );
 
