@@ -1,9 +1,28 @@
-import type { ZodSchema } from "zod";
-import type { Context, MiddlewareHandler } from "hono";
+import { z } from "zod";
+import type {
+  Context,
+  MiddlewareHandler,
+} from "hono";
 
-export function validateBody<T>(schema: ZodSchema<T>): MiddlewareHandler {
-  return async (c: Context, next) => {
+export type AppVariables = {
+  body: unknown;
+  query: unknown;
+  params: unknown;
+};
+
+export type AppEnv = {
+  Variables: AppVariables;
+};
+
+export function validateBody(
+  schema: z.ZodType,
+): MiddlewareHandler<AppEnv> {
+  return async (
+    c: Context<AppEnv>,
+    next,
+  ) => {
     const body = await c.req.json();
+
     const result = schema.safeParse(body);
 
     if (!result.success) {
@@ -13,7 +32,7 @@ export function validateBody<T>(schema: ZodSchema<T>): MiddlewareHandler {
           error: {
             code: "VALIDATION_ERROR",
             message: "Request validation failed.",
-            details: result.error.flatten(),
+            details: z.treeifyError(result.error),
           },
         },
         400,
@@ -26,9 +45,15 @@ export function validateBody<T>(schema: ZodSchema<T>): MiddlewareHandler {
   };
 }
 
-export function validateQuery<T>(schema: ZodSchema<T>): MiddlewareHandler {
-  return async (c: Context, next) => {
+export function validateQuery(
+  schema: z.ZodType,
+): MiddlewareHandler<AppEnv> {
+  return async (
+    c: Context<AppEnv>,
+    next,
+  ) => {
     const query = c.req.query();
+
     const result = schema.safeParse(query);
 
     if (!result.success) {
@@ -38,7 +63,7 @@ export function validateQuery<T>(schema: ZodSchema<T>): MiddlewareHandler {
           error: {
             code: "VALIDATION_ERROR",
             message: "Query validation failed.",
-            details: result.error.flatten(),
+            details: z.treeifyError(result.error),
           },
         },
         400,
@@ -51,9 +76,15 @@ export function validateQuery<T>(schema: ZodSchema<T>): MiddlewareHandler {
   };
 }
 
-export function validateParams<T>(schema: ZodSchema<T>): MiddlewareHandler {
-  return async (c: Context, next) => {
+export function validateParams(
+  schema: z.ZodType,
+): MiddlewareHandler<AppEnv> {
+  return async (
+    c: Context<AppEnv>,
+    next,
+  ) => {
     const params = c.req.param();
+
     const result = schema.safeParse(params);
 
     if (!result.success) {
@@ -63,7 +94,7 @@ export function validateParams<T>(schema: ZodSchema<T>): MiddlewareHandler {
           error: {
             code: "VALIDATION_ERROR",
             message: "Path parameter validation failed.",
-            details: result.error.flatten(),
+            details: z.treeifyError(result.error),
           },
         },
         400,
