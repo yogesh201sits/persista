@@ -24,15 +24,15 @@ const extractor = ExtractorFactory.create({
 const embeddingProvider =
   new HuggingFaceProvider({
     apiKey: config.hfToken!,
-    model: "BAAI/bge-small-en-v1.5",
-    dimensions: 384,
+     model: "sentence-transformers/distiluse-base-multilingual-cased-v2",
+  dimensions: 512,
   });
 
 const vectorStore = new QdrantVectorStore({
   url: config.qdrantUrl!,
   apiKey: config.qdrantApiKey,
-  collection: "persista-memory",
-  dimensions: 384,
+  collection: "persista-vector-test",
+  dimensions: 512,
 });
 
 const memoryManager =
