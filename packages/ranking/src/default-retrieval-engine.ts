@@ -25,10 +25,18 @@ export class DefaultRetrievalEngine
     const embedding =
       await this.embeddingProvider.embed(query);
 
+    const candidateLimit =
+      options?.limit !== undefined
+        ? Math.max(options.limit * 3, 10)
+        : 10;
+
     const results =
       await this.vectorStore.search(
         embedding,
-        options,
+        {
+          ...options,
+          limit: candidateLimit,
+        },
       );
 
     let filteredResults = results;
