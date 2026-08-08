@@ -1,9 +1,7 @@
 import type { EmbeddingProvider } from "@persista/shared";
 
 export class EmbeddingClient {
-  constructor(
-    private readonly provider: EmbeddingProvider,
-  ) {}
+  constructor(private readonly provider: EmbeddingProvider) {}
 
   async embed(text: string): Promise<number[]> {
     return this.provider.embed(text);

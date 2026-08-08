@@ -1,6 +1,6 @@
 import type {
-    EmbeddingProvider,
-    EmbeddingProviderType,
+  EmbeddingProvider,
+  EmbeddingProviderType,
 } from "@persista/shared";
 
 import { HuggingFaceClient } from "../client";
@@ -18,9 +18,7 @@ export class HuggingFaceProvider implements EmbeddingProvider {
 
   private readonly client: HuggingFaceClient;
 
-  constructor(
-    private readonly options: HuggingFaceProviderOptions,
-  ) {
+  constructor(private readonly options: HuggingFaceProviderOptions) {
     this.client = new HuggingFaceClient({
       apiKey: options.apiKey,
     });
@@ -34,17 +32,12 @@ export class HuggingFaceProvider implements EmbeddingProvider {
     return this.client.embed(this.options.model, text);
   }
 
-  async embedBatch(
-    texts: string[],
-  ): Promise<number[][]> {
+  async embedBatch(texts: string[]): Promise<number[][]> {
     if (texts.length === 0) {
       return [];
     }
 
-    return this.client.embedBatch(
-      this.options.model,
-      texts,
-    );
+    return this.client.embedBatch(this.options.model, texts);
   }
 
   async dimensions(): Promise<number> {

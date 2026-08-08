@@ -1,9 +1,6 @@
 import { config } from "./env";
 
-import {
-  ExtractorFactory,
-  LangChainProvider,
-} from "@persista/extractor";
+import { ExtractorFactory, LangChainProvider } from "@persista/extractor";
 
 import { HuggingFaceProvider } from "@persista/embeddings";
 
@@ -21,12 +18,11 @@ const extractor = ExtractorFactory.create({
   llmProvider,
 });
 
-const embeddingProvider =
-  new HuggingFaceProvider({
-    apiKey: config.hfToken!,
-     model: "sentence-transformers/distiluse-base-multilingual-cased-v2",
+const embeddingProvider = new HuggingFaceProvider({
+  apiKey: config.hfToken!,
+  model: "sentence-transformers/distiluse-base-multilingual-cased-v2",
   dimensions: 512,
-  });
+});
 
 const vectorStore = new QdrantVectorStore({
   url: config.qdrantUrl!,
@@ -35,12 +31,11 @@ const vectorStore = new QdrantVectorStore({
   dimensions: 512,
 });
 
-const memoryManager =
-  new DefaultMemoryManager(
-    extractor,
-    embeddingProvider,
-    vectorStore,
-  );
+const memoryManager = new DefaultMemoryManager(
+  extractor,
+  embeddingProvider,
+  vectorStore,
+);
 
 await memoryManager.remember({
   messages: [

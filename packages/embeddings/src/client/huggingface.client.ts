@@ -11,10 +11,7 @@ export class HuggingFaceClient {
     this.client = new InferenceClient(options.apiKey);
   }
 
-  async embed(
-    model: string,
-    text: string,
-  ): Promise<number[]> {
+  async embed(model: string, text: string): Promise<number[]> {
     const embedding = await this.client.featureExtraction({
       model,
       inputs: text,
@@ -23,12 +20,7 @@ export class HuggingFaceClient {
     return embedding as number[];
   }
 
-  async embedBatch(
-    model: string,
-    texts: string[],
-  ): Promise<number[][]> {
-    return Promise.all(
-      texts.map((text) => this.embed(model, text)),
-    );
+  async embedBatch(model: string, texts: string[]): Promise<number[][]> {
+    return Promise.all(texts.map((text) => this.embed(model, text)));
   }
 }

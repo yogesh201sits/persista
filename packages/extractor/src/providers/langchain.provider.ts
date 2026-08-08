@@ -1,9 +1,7 @@
 import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import type { ExtractedMemory } from "../models";
-import {
-  extractedMemoriesSchema,
-} from "../schemas/extracted-memory.schema";
+import { extractedMemoriesSchema } from "../schemas/extracted-memory.schema";
 import type { LLMProvider } from "./llm-provider";
 
 export interface LangChainProviderOptions {
@@ -21,17 +19,14 @@ export class LangChainProvider implements LLMProvider {
     });
   }
 
-  async extractMemories(
-    sentences: string[],
-  ): Promise<ExtractedMemory[]> {
+  async extractMemories(sentences: string[]): Promise<ExtractedMemory[]> {
     if (sentences.length === 0) {
       return [];
     }
 
-    const structuredModel =
-      this.model.withStructuredOutput(
-        extractedMemoriesSchema,
-      );
+    const structuredModel = this.model.withStructuredOutput(
+      extractedMemoriesSchema,
+    );
 
     const prompt = ChatPromptTemplate.fromMessages([
       [
@@ -67,8 +62,7 @@ Extract memories from these sentences:
       sentences: sentences.join("\n"),
     });
 
-    const result =
-      await structuredModel.invoke(messages);
+    const result = await structuredModel.invoke(messages);
 
     return result.memories;
   }

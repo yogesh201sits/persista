@@ -22,9 +22,7 @@ describe("HuggingFaceProvider", () => {
   });
 
   test("should reject empty text", async () => {
-    await expect(provider.embed("")).rejects.toThrow(
-      "Text cannot be empty.",
-    );
+    await expect(provider.embed("")).rejects.toThrow("Text cannot be empty.");
   });
 
   test("should return empty array for empty batch", async () => {
@@ -60,16 +58,13 @@ describe("HuggingFaceProvider", () => {
 
     (provider as any).client.embedBatch = spy;
 
-    const result = await provider.embedBatch([
-      "Hello",
-      "Persista",
-    ]);
+    const result = await provider.embedBatch(["Hello", "Persista"]);
 
     expect(result).toEqual(expected);
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(
-      "BAAI/bge-small-en-v1.5",
-      ["Hello", "Persista"],
-    );
+    expect(spy).toHaveBeenCalledWith("BAAI/bge-small-en-v1.5", [
+      "Hello",
+      "Persista",
+    ]);
   });
 });

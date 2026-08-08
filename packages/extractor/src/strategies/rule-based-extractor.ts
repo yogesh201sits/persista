@@ -39,28 +39,25 @@ const RULES: Rule[] = [
   {
     pattern: /^i like (.+)$/i,
     type: "preference",
-    confidence: 0.90,
+    confidence: 0.9,
     rule: "preference.like",
   },
   {
     pattern: /^i use (.+)$/i,
     type: "preference",
-    confidence: 0.90,
+    confidence: 0.9,
     rule: "preference.tool",
   },
   {
     pattern: /^i(?:'m| am) learning (.+)$/i,
     type: "goal",
-    confidence: 0.90,
+    confidence: 0.9,
     rule: "goal.learning",
   },
 ];
 
-
 export class RuleBasedExtractor implements ExtractorStrategy {
-  async extract(
-    sentences: string[],
-  ): Promise<ExtractedMemory[]> {
+  async extract(sentences: string[]): Promise<ExtractedMemory[]> {
     const memories: ExtractedMemory[] = [];
 
     for (const sentence of sentences) {

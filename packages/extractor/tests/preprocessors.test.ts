@@ -51,7 +51,7 @@ describe("TextNormalizer", () => {
   test("should replace smart double quotes", () => {
     const input = "“Hello World”";
 
-    expect(normalizer.normalize(input)).toBe("\"Hello World\"");
+    expect(normalizer.normalize(input)).toBe('"Hello World"');
   });
 
   test("should replace smart single quotes", () => {
@@ -71,8 +71,7 @@ describe("SentenceSplitter", () => {
   const splitter = new SentenceSplitter();
 
   test("should split sentences by period", () => {
-    const input =
-      "My name is Yogesh. I work on Persista. I like TypeScript.";
+    const input = "My name is Yogesh. I work on Persista. I like TypeScript.";
 
     expect(splitter.split(input)).toEqual([
       "My name is Yogesh",
@@ -82,8 +81,7 @@ describe("SentenceSplitter", () => {
   });
 
   test("should split by newline", () => {
-    const input =
-      "My name is Yogesh\nI work on Persista\nI like TypeScript";
+    const input = "My name is Yogesh\nI work on Persista\nI like TypeScript";
 
     expect(splitter.split(input)).toEqual([
       "My name is Yogesh",
@@ -93,8 +91,7 @@ describe("SentenceSplitter", () => {
   });
 
   test("should split by question mark and exclamation mark", () => {
-    const input =
-      "How are you? I am fine! I like Persista.";
+    const input = "How are you? I am fine! I like Persista.";
 
     expect(splitter.split(input)).toEqual([
       "How are you",
@@ -104,13 +101,9 @@ describe("SentenceSplitter", () => {
   });
 
   test("should ignore empty sentences", () => {
-    const input =
-      "Hello...\n\nWorld!!!";
+    const input = "Hello...\n\nWorld!!!";
 
-    expect(splitter.split(input)).toEqual([
-      "Hello",
-      "World",
-    ]);
+    expect(splitter.split(input)).toEqual(["Hello", "World"]);
   });
 
   test("should return empty array for empty input", () => {

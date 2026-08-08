@@ -1,7 +1,11 @@
 import type { Conversation } from "@persista/shared";
 
 import type { ExtractionResult } from "../models";
-import {SentenceSplitter,TextCleaner,TextNormalizer,} from "../preprocessors";
+import {
+  SentenceSplitter,
+  TextCleaner,
+  TextNormalizer,
+} from "../preprocessors";
 import type { ExtractorStrategy } from "../strategies";
 
 export class Extractor {
@@ -12,9 +16,7 @@ export class Extractor {
     private readonly strategy: ExtractorStrategy,
   ) {}
 
-  async extract(
-    conversation: Conversation,
-  ): Promise<ExtractionResult> {
+  async extract(conversation: Conversation): Promise<ExtractionResult> {
     const start = performance.now();
 
     const text = conversation.messages

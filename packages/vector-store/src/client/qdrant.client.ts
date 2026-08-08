@@ -10,9 +10,7 @@ export interface QdrantClientOptions {
 export class QdrantClient {
   private readonly client: QdrantSdk;
 
-  constructor(
-    private readonly options: QdrantClientOptions,
-  ) {
+  constructor(private readonly options: QdrantClientOptions) {
     this.client = new QdrantSdk({
       url: options.url,
       apiKey: options.apiKey,
@@ -68,10 +66,7 @@ export class QdrantClient {
     });
   }
 
-  async search(
-    vector: number[],
-    limit = 10,
-  ) {
+  async search(vector: number[], limit = 10) {
     return await this.client.query(this.options.collection, {
       query: vector,
       limit,

@@ -5,10 +5,8 @@ import type {
 } from "@persista/vector-store";
 
 export interface MemoryManager {
-  remember(
-    conversation: Conversation,
-  ): Promise<void>;
-   search(
+  remember(conversation: Conversation): Promise<void>;
+  search(
     query: string,
     options?: VectorSearchOptions,
   ): Promise<VectorSearchResult[]>;

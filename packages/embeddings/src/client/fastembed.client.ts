@@ -1,45 +1,43 @@
 import { EmbeddingModel, FlagEmbedding } from "fastembed";
 
 export interface FastEmbedClientOptions {
-    model?: EmbeddingModel;
+  model?: EmbeddingModel;
 }
 
 export class FastEmbedClient {
-    private model: FlagEmbedding | null = null;
+  private model: FlagEmbedding | null = null;
 
-    constructor(
-        private readonly options: FastEmbedClientOptions = {},
-    ) { }
+  constructor(private readonly options: FastEmbedClientOptions = {}) {}
 
-    private async getModel(): Promise<FlagEmbedding> {
-        if (!this.model) {
-            this.model = await FlagEmbedding.init({
-                model: EmbeddingModel.BGESmallENV15,
-            });
-        }
-
-        return this.model;
+  private async getModel(): Promise<FlagEmbedding> {
+    if (!this.model) {
+      this.model = await FlagEmbedding.init({
+        model: EmbeddingModel.BGESmallENV15,
+      });
     }
 
-    async embed(text: string): Promise<number[]> {
-        const embeddingModel = await this.getModel();
+    return this.model;
+  }
 
-        for await (const batch of embeddingModel.embed([text])) {
-            return batch[0]!;
-        }
+  async embed(text: string): Promise<number[]> {
+    const embeddingModel = await this.getModel();
 
-        throw new Error("Failed to generate embedding.");
+    for await (const batch of embeddingModel.embed([text])) {
+      return batch[0]!;
     }
 
-    async embedBatch(texts: string[]): Promise<number[][]> {
-        const embeddingModel = await this.getModel();
+    throw new Error("Failed to generate embedding.");
+  }
 
-        const vectors: number[][] = [];
+  async embedBatch(texts: string[]): Promise<number[][]> {
+    const embeddingModel = await this.getModel();
 
-        for await (const batch of embeddingModel.embed(texts)) {
-            vectors.push(...batch);
-        }
+    const vectors: number[][] = [];
 
-        return vectors;
+    for await (const batch of embeddingModel.embed(texts)) {
+      vectors.push(...batch);
     }
+
+    return vectors;
+  }
 }

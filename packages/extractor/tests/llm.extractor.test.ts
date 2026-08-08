@@ -36,9 +36,7 @@ describe("LLMExtractor", () => {
 
     const extractor = new LLMExtractor(llm);
 
-    const result = await extractor.extract([
-      "I prefer TypeScript.",
-    ]);
+    const result = await extractor.extract(["I prefer TypeScript."]);
 
     expect(generate).toHaveBeenCalledTimes(1);
 
@@ -107,9 +105,7 @@ describe("LLMExtractor", () => {
 
     const extractor = new LLMExtractor(llm);
 
-    expect(
-      extractor.extract(["I prefer TypeScript."]),
-    ).rejects.toThrow();
+    expect(extractor.extract(["I prefer TypeScript."])).rejects.toThrow();
   });
 
   test("should send sentences to the LLM", async () => {
@@ -126,20 +122,13 @@ describe("LLMExtractor", () => {
 
     const extractor = new LLMExtractor(llm);
 
-    await extractor.extract([
-      "I prefer TypeScript.",
-      "I am learning AI.",
-    ]);
+    await extractor.extract(["I prefer TypeScript.", "I am learning AI."]);
 
     expect(generate).toHaveBeenCalledTimes(1);
 
-    expect(receivedPrompt).toContain(
-      "I prefer TypeScript.",
-    );
+    expect(receivedPrompt).toContain("I prefer TypeScript.");
 
-    expect(receivedPrompt).toContain(
-      "I am learning AI.",
-    );
+    expect(receivedPrompt).toContain("I am learning AI.");
   });
 });
 test("should reject invalid memory type", async () => {
@@ -158,9 +147,7 @@ test("should reject invalid memory type", async () => {
 
   const extractor = new LLMExtractor(llm);
 
-  expect(
-    extractor.extract(["I prefer TypeScript."]),
-  ).rejects.toThrow();
+  expect(extractor.extract(["I prefer TypeScript."])).rejects.toThrow();
 });
 test("should reject invalid confidence", async () => {
   const llm: LLMProvider = {
@@ -178,7 +165,5 @@ test("should reject invalid confidence", async () => {
 
   const extractor = new LLMExtractor(llm);
 
-  expect(
-    extractor.extract(["I prefer TypeScript."]),
-  ).rejects.toThrow();
+  expect(extractor.extract(["I prefer TypeScript."])).rejects.toThrow();
 });

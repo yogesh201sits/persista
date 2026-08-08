@@ -18,9 +18,7 @@ export interface QdrantVectorStoreOptions {
 export class QdrantVectorStore implements VectorStore {
   private readonly client: QdrantClient;
 
-  constructor(
-    private readonly options: QdrantVectorStoreOptions,
-  ) {
+  constructor(private readonly options: QdrantVectorStoreOptions) {
     this.client = new QdrantClient({
       url: options.url,
       apiKey: options.apiKey,
@@ -29,22 +27,14 @@ export class QdrantVectorStore implements VectorStore {
     });
   }
 
-  async upsert(
-    memory: VectorMemory,
-  ): Promise<void> {
-    await this.client.upsert(
-      memory.id,
-      memory.embedding,
-      {
-        namespace: memory.namespace,
-        ...memory.metadata,
-      },
-    );
+  async upsert(memory: VectorMemory): Promise<void> {
+    await this.client.upsert(memory.id, memory.embedding, {
+      namespace: memory.namespace,
+      ...memory.metadata,
+    });
   }
 
-  async upsertBatch(
-    memories: VectorMemory[],
-  ): Promise<void> {
+  async upsertBatch(memories: VectorMemory[]): Promise<void> {
     if (memories.length === 0) {
       return;
     }
@@ -69,10 +59,7 @@ export class QdrantVectorStore implements VectorStore {
       return [];
     }
 
-    const result = await this.client.search(
-      embedding,
-      options?.limit ?? 10,
-    );
+    const result = await this.client.search(embedding, options?.limit ?? 10);
 
     return result.points.map((point) => ({
       id: String(point.id),

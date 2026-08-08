@@ -5,13 +5,9 @@ import type {
 } from "../models";
 
 export interface VectorStore {
-  upsert(
-    memory: VectorMemory,
-  ): Promise<void>;
+  upsert(memory: VectorMemory): Promise<void>;
 
-  upsertBatch(
-    memories: VectorMemory[],
-  ): Promise<void>;
+  upsertBatch(memories: VectorMemory[]): Promise<void>;
 
   search(
     embedding: number[],

@@ -1,12 +1,7 @@
 export interface VectorMemoryMetadata {
   content: string;
 
-  type:
-    | "fact"
-    | "identity"
-    | "preference"
-    | "goal"
-    | "relationship";
+  type: "fact" | "identity" | "preference" | "goal" | "relationship";
 
   confidence: number;
 

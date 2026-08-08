@@ -3,4 +3,4 @@ export * from "./models";
 export * from "./preprocessors";
 export * from "./providers";
 export * from "./strategies";
-export * from './factories';
+export * from "./factories";

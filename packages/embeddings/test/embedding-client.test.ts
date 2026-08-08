@@ -29,10 +29,7 @@ describe("EmbeddingClient", () => {
   });
 
   test("should embed batch", async () => {
-    const result = await client.embedBatch([
-      "Hello",
-      "World",
-    ]);
+    const result = await client.embedBatch(["Hello", "World"]);
 
     expect(result).toEqual([
       [1, 2, 3],

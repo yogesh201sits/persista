@@ -6,9 +6,7 @@ describe("RuleBasedExtractor", () => {
   const extractor = new RuleBasedExtractor();
 
   test("should extract identity", async () => {
-    const memories = await extractor.extract([
-      "My name is Yogesh",
-    ]);
+    const memories = await extractor.extract(["My name is Yogesh"]);
 
     expect(memories).toHaveLength(1);
 
@@ -20,9 +18,7 @@ describe("RuleBasedExtractor", () => {
   });
 
   test("should extract project", async () => {
-    const memories = await extractor.extract([
-      "I work on Persista",
-    ]);
+    const memories = await extractor.extract(["I work on Persista"]);
 
     expect(memories).toHaveLength(1);
 
@@ -33,9 +29,7 @@ describe("RuleBasedExtractor", () => {
   });
 
   test("should extract preference", async () => {
-    const memories = await extractor.extract([
-      "I prefer TypeScript",
-    ]);
+    const memories = await extractor.extract(["I prefer TypeScript"]);
 
     expect(memories).toHaveLength(1);
 
@@ -46,9 +40,7 @@ describe("RuleBasedExtractor", () => {
   });
 
   test("should extract learning goal", async () => {
-    const memories = await extractor.extract([
-      "I'm learning Rust",
-    ]);
+    const memories = await extractor.extract(["I'm learning Rust"]);
 
     expect(memories).toHaveLength(1);
 
@@ -59,9 +51,7 @@ describe("RuleBasedExtractor", () => {
   });
 
   test("should return empty array when nothing matches", async () => {
-    const memories = await extractor.extract([
-      "Today is a sunny day",
-    ]);
+    const memories = await extractor.extract(["Today is a sunny day"]);
 
     expect(memories).toHaveLength(0);
   });

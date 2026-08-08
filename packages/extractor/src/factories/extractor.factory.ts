@@ -15,11 +15,8 @@ export interface ExtractorFactoryOptions {
 }
 
 export class ExtractorFactory {
-  static create(
-    options: ExtractorFactoryOptions,
-  ): Extractor {
-    const strategy =
-      ExtractorFactory.createStrategy(options);
+  static create(options: ExtractorFactoryOptions): Extractor {
+    const strategy = ExtractorFactory.createStrategy(options);
 
     return new Extractor(
       new TextCleaner(),
@@ -29,23 +26,17 @@ export class ExtractorFactory {
     );
   }
 
-  private static createStrategy(
-    options: ExtractorFactoryOptions,
-  ) {
+  private static createStrategy(options: ExtractorFactoryOptions) {
     switch (options.type) {
       case "rule-based":
         return new RuleBasedExtractor();
 
       case "llm":
         if (!options.llmProvider) {
-          throw new Error(
-            "LLM provider is required for LLM extractor",
-          );
+          throw new Error("LLM provider is required for LLM extractor");
         }
 
-        return new LLMExtractor(
-          options.llmProvider,
-        );
+        return new LLMExtractor(options.llmProvider);
     }
   }
 }

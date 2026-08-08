@@ -3,10 +3,7 @@ import { describe, expect, mock, test } from "bun:test";
 import type { Conversation } from "@persista/shared";
 import type { Extractor } from "@persista/extractor";
 import type { EmbeddingProvider } from "@persista/shared";
-import type {
-  VectorStore,
-  VectorMemory,
-} from "@persista/vector-store";
+import type { VectorStore, VectorMemory } from "@persista/vector-store";
 
 import { DefaultMemoryManager } from "../memory";
 
@@ -80,49 +77,30 @@ describe("DefaultMemoryManager", () => {
       vectorStore,
     );
 
-    await manager.remember(
-      "user-123",
-      conversation,
-    );
+    await manager.remember("user-123", conversation);
 
     expect(extractor.extract).toHaveBeenCalledTimes(1);
 
-    expect(
-      embeddingProvider.embedBatch,
-    ).toHaveBeenCalledTimes(1);
+    expect(embeddingProvider.embedBatch).toHaveBeenCalledTimes(1);
 
-    expect(
-      embeddingProvider.embedBatch,
-    ).toHaveBeenCalledWith([
+    expect(embeddingProvider.embedBatch).toHaveBeenCalledWith([
       "My name is Yogesh.",
       "I prefer TypeScript.",
     ]);
 
-    expect(
-      vectorStore.upsertBatch,
-    ).toHaveBeenCalledTimes(1);
+    expect(vectorStore.upsertBatch).toHaveBeenCalledTimes(1);
 
     expect(storedMemories).toHaveLength(2);
 
-    expect(storedMemories[0].namespace).toBe(
-      "user-123",
-    );
+    expect(storedMemories[0].namespace).toBe("user-123");
 
-    expect(
-      storedMemories[0].metadata!.content,
-    ).toBe("My name is Yogesh.");
+    expect(storedMemories[0].metadata!.content).toBe("My name is Yogesh.");
 
-    expect(
-      storedMemories[0].metadata!.type,
-    ).toBe("identity");
+    expect(storedMemories[0].metadata!.type).toBe("identity");
 
-    expect(
-      storedMemories[0].metadata!.confidence,
-    ).toBe(0.99);
+    expect(storedMemories[0].metadata!.confidence).toBe(0.99);
 
-    expect(
-      storedMemories[0].embedding,
-    ).toEqual([0.1, 0.2, 0.3]);
+    expect(storedMemories[0].embedding).toEqual([0.1, 0.2, 0.3]);
   });
 
   test("should not embed or store when no memories are extracted", async () => {
@@ -154,17 +132,10 @@ describe("DefaultMemoryManager", () => {
       vectorStore,
     );
 
-    await manager.remember(
-      "user-123",
-      conversation,
-    );
+    await manager.remember("user-123", conversation);
 
-    expect(
-      embeddingProvider.embedBatch,
-    ).not.toHaveBeenCalled();
+    expect(embeddingProvider.embedBatch).not.toHaveBeenCalled();
 
-    expect(
-      vectorStore.upsertBatch,
-    ).not.toHaveBeenCalled();
+    expect(vectorStore.upsertBatch).not.toHaveBeenCalled();
   });
 });
