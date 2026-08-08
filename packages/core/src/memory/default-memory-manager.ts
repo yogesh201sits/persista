@@ -64,7 +64,8 @@ export class DefaultMemoryManager
           content: memory.content,
           type: memory.type,
           confidence: memory.confidence,
-
+          createdAt:
+            new Date().toISOString(),
           ...(memory.value !== undefined
             ? {
                 value: memory.value,
