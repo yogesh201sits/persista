@@ -1,7 +1,9 @@
 import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import type { ExtractedMemory } from "../models";
-import { extractedMemoriesSchema } from "../schemas/extracted-memory.schema";
+import {
+  extractedMemoriesSchema,
+} from "../schemas/extracted-memory.schema";
 import type { LLMProvider } from "./llm-provider";
 
 export interface LangChainProviderOptions {
@@ -22,30 +24,52 @@ export class LangChainProvider implements LLMProvider {
   async extractMemories(
     sentences: string[],
   ): Promise<ExtractedMemory[]> {
+    if (sentences.length === 0) {
+      return [];
+    }
+
     const structuredModel =
       this.model.withStructuredOutput(
         extractedMemoriesSchema,
       );
 
-    const prompt = ChatPromptTemplate.fromTemplate(`
-Extract meaningful memories from the following sentences.
+    const prompt = ChatPromptTemplate.fromMessages([
+      [
+        "system",
+        `
+You are a memory extraction system.
+
+Extract useful persistent memories from the user's conversation.
 
 Rules:
 - Only extract information explicitly stated.
 - Do not invent information.
 - Ignore irrelevant information.
+- A sentence may produce multiple memories.
 - Confidence must be between 0 and 1.
-- Return the original sentence in "content".
-- Use "value" for the main extracted value when applicable.
+- "content" must contain the original statement.
+- "value" should contain the main extracted value.
+- Return all memories inside the "memories" field.
+- If there are no meaningful memories, return an empty "memories" array.
+        `,
+      ],
+      [
+        "human",
+        `
+Extract memories from these sentences:
 
-Sentences:
 {sentences}
-`);
+        `,
+      ],
+    ]);
 
     const messages = await prompt.formatMessages({
       sentences: sentences.join("\n"),
     });
 
-    return await structuredModel.invoke(messages);
+    const result =
+      await structuredModel.invoke(messages);
+
+    return result.memories;
   }
 }

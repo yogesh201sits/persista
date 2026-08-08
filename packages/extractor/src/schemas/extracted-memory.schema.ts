@@ -16,6 +16,6 @@ export const extractedMemorySchema = z.object({
   value: z.string().optional(),
 });
 
-export const extractedMemoriesSchema = z.array(
-  extractedMemorySchema,
-);
+export const extractedMemoriesSchema = z.object({
+  memories: z.array(extractedMemorySchema),
+});
