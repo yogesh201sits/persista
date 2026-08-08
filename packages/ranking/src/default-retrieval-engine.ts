@@ -40,8 +40,18 @@ export class DefaultRetrievalEngine
       );
     }
 
-    return this.rankingStrategy.rank(
-      filteredResults,
+    const rankedResults =
+      this.rankingStrategy.rank(
+        filteredResults,
+      );
+
+    if (options?.limit === undefined) {
+      return rankedResults;
+    }
+
+    return rankedResults.slice(
+      0,
+      options.limit,
     );
   }
 }
