@@ -10,7 +10,6 @@ export interface MemoryManager {
     conversation: Conversation,
   ): Promise<void>;
    search(
-    namespace: string,
     query: string,
     options?: VectorSearchOptions,
   ): Promise<VectorSearchResult[]>;
