@@ -16,4 +16,8 @@ export const memorySearchRequestSchema =
       .min(0)
       .max(1)
       .optional(),
+
+    filter: z
+      .record(z.string(), z.unknown())
+      .optional(),
   });

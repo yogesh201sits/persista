@@ -17,6 +17,7 @@ memoriesSearch.post(
       query: string;
       limit?: number;
       minScore?: number;
+      filter?: Record<string, unknown>;
     };
 
     const results =
@@ -25,6 +26,7 @@ memoriesSearch.post(
         {
           limit: body.limit ?? 10,
           minScore: body.minScore,
+          filter: body.filter,
         },
       );
 
