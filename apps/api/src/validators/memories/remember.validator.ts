@@ -8,4 +8,19 @@ export const rememberSchema = z.object({
   metadata: metadataSchema.optional(),
 });
 
+export const rememberRequestSchema = z.object({
+  conversation: z.object({
+    messages: z.array(
+      z.object({
+        role: z.enum([
+          "system",
+          "user",
+          "assistant",
+        ]),
+        content: z.string().min(1),
+      }),
+    ),
+  }),
+});
+
 export type RememberInput = z.infer<typeof rememberSchema>;
