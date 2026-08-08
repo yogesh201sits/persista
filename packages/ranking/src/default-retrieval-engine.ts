@@ -1,6 +1,4 @@
-import type {
-  EmbeddingProvider,
-} from "@persista/shared";
+import type { EmbeddingProvider } from "@persista/shared";
 
 import type {
   VectorSearchOptions,
@@ -8,9 +6,8 @@ import type {
   VectorStore,
 } from "@persista/vector-store";
 
-import type {
-  RetrievalEngine,
-} from "./retrieval-engine";
+import type { RankingStrategy } from "./ranking-strategy";
+import type { RetrievalEngine } from "./retrieval-engine";
 
 export class DefaultRetrievalEngine
   implements RetrievalEngine
@@ -18,6 +15,7 @@ export class DefaultRetrievalEngine
   constructor(
     private readonly embeddingProvider: EmbeddingProvider,
     private readonly vectorStore: VectorStore,
+    private readonly rankingStrategy: RankingStrategy,
   ) {}
 
   async search(
@@ -33,13 +31,17 @@ export class DefaultRetrievalEngine
         options,
       );
 
-    if (options?.minScore === undefined) {
-      return results;
+    let filteredResults = results;
+
+    if (options?.minScore !== undefined) {
+      filteredResults = results.filter(
+        (result) =>
+          result.score >= options.minScore!,
+      );
     }
 
-    return results.filter(
-      (result) =>
-        result.score >= options.minScore!,
+    return this.rankingStrategy.rank(
+      filteredResults,
     );
   }
 }
