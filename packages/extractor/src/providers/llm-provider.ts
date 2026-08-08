@@ -1,3 +1,7 @@
+import type { ExtractedMemory } from "../models";
+
 export interface LLMProvider {
-  generate(prompt: string): Promise<string>;
+  extractMemories(
+    sentences: string[],
+  ): Promise<ExtractedMemory[]>;
 }

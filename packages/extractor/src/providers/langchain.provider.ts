@@ -1,4 +1,7 @@
 import { ChatGroq } from "@langchain/groq";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import type { ExtractedMemory } from "../models";
+import { extractedMemoriesSchema } from "../schemas/extracted-memory.schema";
 import type { LLMProvider } from "./llm-provider";
 
 export interface LangChainProviderOptions {
@@ -16,15 +19,33 @@ export class LangChainProvider implements LLMProvider {
     });
   }
 
-  async generate(prompt: string): Promise<string> {
-    const response = await this.model.invoke(prompt);
-
-    if (typeof response.content !== "string") {
-      throw new Error(
-        "LangChain model returned non-string content",
+  async extractMemories(
+    sentences: string[],
+  ): Promise<ExtractedMemory[]> {
+    const structuredModel =
+      this.model.withStructuredOutput(
+        extractedMemoriesSchema,
       );
-    }
 
-    return response.content;
+    const prompt = ChatPromptTemplate.fromTemplate(`
+Extract meaningful memories from the following sentences.
+
+Rules:
+- Only extract information explicitly stated.
+- Do not invent information.
+- Ignore irrelevant information.
+- Confidence must be between 0 and 1.
+- Return the original sentence in "content".
+- Use "value" for the main extracted value when applicable.
+
+Sentences:
+{sentences}
+`);
+
+    const messages = await prompt.formatMessages({
+      sentences: sentences.join("\n"),
+    });
+
+    return await structuredModel.invoke(messages);
   }
 }

@@ -1,6 +1,5 @@
 import type { ExtractedMemory } from "../models";
 import type { LLMProvider } from "../providers/llm-provider";
-import { extractedMemoriesSchema } from "../schemas/extracted-memory.schema";
 import type { ExtractorStrategy } from "./extractor-strategy";
 
 export class LLMExtractor implements ExtractorStrategy {
@@ -15,47 +14,6 @@ export class LLMExtractor implements ExtractorStrategy {
       return [];
     }
 
-    const prompt = this.buildPrompt(sentences);
-
-    const response =
-      await this.llm.generate(prompt);
-
-    return this.parseResponse(response);
-  }
-
-  private buildPrompt(
-    sentences: string[],
-  ): string {
-    return `
-Extract meaningful memories from the following sentences.
-
-Return ONLY valid JSON in this format:
-
-[
-  {
-    "content": "original sentence",
-    "type": "fact | identity | preference | goal | relationship",
-    "confidence": 0.0,
-    "value": "extracted value"
-  }
-]
-
-Rules:
-- Only extract information explicitly stated.
-- Do not invent information.
-- Confidence must be between 0 and 1.
-- Ignore irrelevant sentences.
-
-Sentences:
-${sentences.join("\n")}
-`;
-  }
-
-  private parseResponse(
-    response: string,
-  ): ExtractedMemory[] {
-    const parsed: unknown = JSON.parse(response);
-
-    return extractedMemoriesSchema.parse(parsed);
+    return await this.llm.extractMemories(sentences);
   }
 }
