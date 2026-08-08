@@ -6,9 +6,23 @@ import type {
   RankingStrategy,
 } from "./ranking-strategy";
 
+export interface RankingWeights {
+  similarity: number;
+  confidence: number;
+  recency: number;
+}
+
 export class DefaultRankingStrategy
   implements RankingStrategy
 {
+  constructor(
+    private readonly weights: RankingWeights = {
+      similarity: 0.6,
+      confidence: 0.2,
+      recency: 0.2,
+    },
+  ) {}
+
   rank(
     results: VectorSearchResult[],
   ): VectorSearchResult[] {
@@ -73,9 +87,12 @@ export class DefaultRankingStrategy
     }
 
     return (
-      similarity * 0.6 +
-      confidence * 0.2 +
-      recency * 0.2
+      similarity *
+        this.weights.similarity +
+      confidence *
+        this.weights.confidence +
+      recency *
+        this.weights.recency
     );
   }
 }
