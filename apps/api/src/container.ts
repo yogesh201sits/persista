@@ -11,6 +11,10 @@ import { QdrantVectorStore } from "@persista/vector-store";
 
 import { DefaultMemoryManager } from "@persista/core";
 
+import {
+  DefaultRetrievalEngine,
+} from "@persista/ranking";
+
 
 let llmProvider;
 
@@ -53,9 +57,16 @@ const vectorStore = new QdrantVectorStore({
   dimensions: 512,
 });
 
+const retrievalEngine =
+  new DefaultRetrievalEngine(
+    embeddingProvider,
+    vectorStore,
+  );
 
-export const memoryManager = new DefaultMemoryManager(
-  extractor,
-  embeddingProvider,
-  vectorStore,
-);
+export const memoryManager =
+  new DefaultMemoryManager(
+    extractor,
+    embeddingProvider,
+    vectorStore,
+    retrievalEngine,
+  );
