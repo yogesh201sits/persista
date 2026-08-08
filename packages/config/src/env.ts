@@ -6,4 +6,11 @@ export const envSchema = z.object({
 
 export const config = {
   groqApiKey: process.env.GROQ_API_KEY,
+  hfToken: process.env.HF_TOKEN,
+  qdrantUrl:process.env.QDRANT_URL,
+  qdrantApiKey: process.env.QDRANT_API_KEY
 };
+
+export const hfToken = {
+
+}

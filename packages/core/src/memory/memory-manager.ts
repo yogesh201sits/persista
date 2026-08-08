@@ -6,7 +6,6 @@ import type {
 
 export interface MemoryManager {
   remember(
-    namespace: string,
     conversation: Conversation,
   ): Promise<void>;
    search(

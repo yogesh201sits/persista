@@ -18,7 +18,7 @@ export interface VectorMemoryMetadata {
 export interface VectorMemory {
   id: string;
 
-  namespace: string;
+  namespace?: string;
 
   embedding: number[];
 

@@ -1,6 +1,15 @@
-import { LangChainProvider } from "@persista/extractor";
-import {config} from "./env";
-import { ExtractorFactory } from "@persista/extractor";
+import { config } from "./env";
+
+import {
+  ExtractorFactory,
+  LangChainProvider,
+} from "@persista/extractor";
+
+import { HuggingFaceProvider } from "@persista/embeddings";
+
+import { QdrantVectorStore } from "@persista/vector-store";
+
+import { DefaultMemoryManager } from "@persista/core";
 
 const llmProvider = new LangChainProvider({
   apiKey: config.groqApiKey!,
@@ -12,7 +21,28 @@ const extractor = ExtractorFactory.create({
   llmProvider,
 });
 
-const result = await extractor.extract({
+const embeddingProvider =
+  new HuggingFaceProvider({
+    apiKey: config.hfToken!,
+    model: "BAAI/bge-small-en-v1.5",
+    dimensions: 384,
+  });
+
+const vectorStore = new QdrantVectorStore({
+  url: config.qdrantUrl!,
+  apiKey: config.qdrantApiKey,
+  collection: "persista-memory",
+  dimensions: 384,
+});
+
+const memoryManager =
+  new DefaultMemoryManager(
+    extractor,
+    embeddingProvider,
+    vectorStore,
+  );
+
+await memoryManager.remember({
   messages: [
     {
       role: "user",
@@ -22,4 +52,8 @@ const result = await extractor.extract({
   ],
 });
 
-console.log(result);
+const results = await memoryManager.search(
+  "What programming language do I prefer?",
+);
+
+console.log(results);
