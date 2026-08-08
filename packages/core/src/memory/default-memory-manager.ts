@@ -1,4 +1,7 @@
-import type { Conversation, EmbeddingProvider } from "@persista/shared";
+import type {
+  Conversation,
+  EmbeddingProvider,
+} from "@persista/shared";
 
 import type {
   VectorStore,
@@ -8,10 +11,11 @@ import type {
 } from "@persista/vector-store";
 
 import type { Extractor } from "@persista/extractor";
+import type {
+  RetrievalEngine,
+} from "@persista/ranking";
 
 import type { MemoryManager } from "./memory-manager";
-
-import {RetrievalEngine} from "@persista/ranking"
 
 export class DefaultMemoryManager
   implements MemoryManager

@@ -7,6 +7,8 @@ import {
   memorySearchRequestSchema,
 } from "../validators";
 
+import { VectorSearchFilter } from "@persista/vector-store";
+
 const memoriesSearch = new Hono();
 
 memoriesSearch.post(
@@ -17,7 +19,7 @@ memoriesSearch.post(
       query: string;
       limit?: number;
       minScore?: number;
-      filter?: Record<string, unknown>;
+      filter?: VectorSearchFilter[];
     };
 
     const results =
