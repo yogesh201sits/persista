@@ -32,7 +32,8 @@
       "@persista/embeddings": ["packages/embeddings/src"],
       "@persista/providers": ["packages/providers/src"],
       "@persista/ranking": ["packages/ranking/src"],
-      "@persista/graph": ["packages/graph/src"]
+      "@persista/graph": ["packages/graph/src"],
+      "@persista/config":["packages/config/src"]
     }
   }
 }
