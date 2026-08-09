@@ -6,8 +6,6 @@ import {
   ChatPromptTemplate,
 } from "@langchain/core/prompts";
 
-import { z } from "zod";
-
 import type { Conversation } from "@persista/shared";
 
 import type {

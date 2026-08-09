@@ -1,0 +1,244 @@
+import neo4j, {
+  type Driver,
+} from "neo4j-driver";
+
+import type {
+  Entity,
+  Relationship,
+} from "../models";
+
+import type { GraphStore } from "../interfaces";
+
+export interface Neo4jGraphStoreOptions {
+  uri: string;
+  username: string;
+  password: string;
+}
+
+export class Neo4jGraphStore
+  implements GraphStore
+{
+  private readonly driver: Driver;
+
+  constructor(
+    options: Neo4jGraphStoreOptions,
+  ) {
+    this.driver = neo4j.driver(
+      options.uri,
+      neo4j.auth.basic(
+        options.username,
+        options.password,
+      ),
+    );
+  }
+
+  async upsertEntity(
+    entity: Entity,
+  ): Promise<void> {
+    const session =
+      this.driver.session();
+
+    try {
+      await session.run(
+        `
+        MERGE (e:Entity {id: $id})
+        SET
+          e.name = $name,
+          e.type = $type,
+          e.metadata = $metadata
+        `,
+        {
+          id: entity.id,
+          name: entity.name,
+          type: entity.type,
+          metadata:
+            entity.metadata ?? {},
+        },
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
+  async upsertRelationship(
+    relationship: Relationship,
+  ): Promise<void> {
+    const session =
+      this.driver.session();
+
+    try {
+      await session.run(
+        `
+        MATCH (source:Entity {id: $sourceId})
+        MATCH (target:Entity {id: $targetId})
+
+        MERGE (
+          source
+        )-[r:RELATED_TO {
+          id: $id
+        }]->(
+          target
+        )
+
+        SET
+          r.type = $type,
+          r.confidence = $confidence,
+          r.metadata = $metadata
+        `,
+        {
+          id: relationship.id,
+          sourceId:
+            relationship.sourceId,
+          targetId:
+            relationship.targetId,
+          type: relationship.type,
+          confidence:
+            relationship.confidence,
+          metadata:
+            relationship.metadata ?? {},
+        },
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
+  async getEntity(
+    id: string,
+  ): Promise<Entity | null> {
+    const session =
+      this.driver.session();
+
+    try {
+      const result =
+        await session.run(
+          `
+          MATCH (e:Entity {id: $id})
+          RETURN e
+          `,
+          { id },
+        );
+
+      if (result.records.length === 0) {
+        return null;
+      }
+
+      const node =
+        result.records[0]
+          .get("e");
+
+      return {
+        id: node.properties.id,
+        name: node.properties.name,
+        type: node.properties.type,
+        metadata:
+          node.properties.metadata,
+      };
+    } finally {
+      await session.close();
+    }
+  }
+
+  async getRelationships(
+    entityId: string,
+  ): Promise<Relationship[]> {
+    const session =
+      this.driver.session();
+
+    try {
+      const result =
+        await session.run(
+          `
+          MATCH (source:Entity)
+                -[r:RELATED_TO]->
+                (target:Entity)
+
+          WHERE
+            source.id = $entityId
+            OR target.id = $entityId
+
+          RETURN
+            r,
+            source.id AS sourceId,
+            target.id AS targetId
+          `,
+          { entityId },
+        );
+
+      return result.records.map(
+        (record) => {
+          const relationship =
+            record.get("r");
+
+          return {
+            id:
+              relationship
+                .properties.id,
+
+            sourceId:
+              record.get("sourceId"),
+
+            targetId:
+              record.get("targetId"),
+
+            type:
+              relationship
+                .properties.type,
+
+            confidence:
+              relationship
+                .properties.confidence,
+
+            metadata:
+              relationship
+                .properties.metadata,
+          };
+        },
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
+  async deleteEntity(
+    id: string,
+  ): Promise<void> {
+    const session =
+      this.driver.session();
+
+    try {
+      await session.run(
+        `
+        MATCH (e:Entity {id: $id})
+        DETACH DELETE e
+        `,
+        { id },
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
+  async deleteRelationship(
+    id: string,
+  ): Promise<void> {
+    const session =
+      this.driver.session();
+
+    try {
+      await session.run(
+        `
+        MATCH ()-[r:RELATED_TO {id: $id}]->()
+        DELETE r
+        `,
+        { id },
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
+  async close(): Promise<void> {
+    await this.driver.close();
+  }
+}
