@@ -1,1 +1,1 @@
-export * from "./memory-client";
+export * from "./client";

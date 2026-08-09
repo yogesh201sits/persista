@@ -1,4 +1,4 @@
-export interface MemoryClientOptions {
+export interface PersistaClientOptions {
   apiKey?: string;
 
   baseUrl?: string;

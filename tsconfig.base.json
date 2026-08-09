@@ -5,35 +5,26 @@
     "moduleResolution": "Bundler",
     "ignoreDeprecations": "6.0",
     "strict": true,
-
     "esModuleInterop": true,
-
     "skipLibCheck": true,
-
     "resolveJsonModule": true,
-
     "allowSyntheticDefaultImports": true,
-
     "forceConsistentCasingInFileNames": true,
-
     "isolatedModules": true,
-
     "types": ["bun", "node"],
 
-    "baseUrl": ".",
-
     "paths": {
-      "@persista/shared": ["packages/shared/src"],
-      "@persista/core": ["packages/core/src"],
-      "@persista/sdk": ["packages/sdk/src"],
-      "@persista/database": ["packages/database/src"],
-      "@persista/vector-store": ["packages/vector-store/src"],
-      "@persista/extractor": ["packages/extractor/src"],
-      "@persista/embeddings": ["packages/embeddings/src"],
-      "@persista/providers": ["packages/providers/src"],
-      "@persista/ranking": ["packages/ranking/src"],
-      "@persista/graph": ["packages/graph/src"],
-      "@persista/config":["packages/config/src"]
+      "@persista/shared": ["./packages/shared/src"],
+      "@persista/core": ["./packages/core/src"],
+      "@persista/sdk": ["./packages/sdk/src"],
+      "@persista/database": ["./packages/database/src"],
+      "@persista/vector-store": ["./packages/vector-store/src"],
+      "@persista/extractor": ["./packages/extractor/src"],
+      "@persista/embeddings": ["./packages/embeddings/src"],
+      "@persista/providers": ["./packages/providers/src"],
+      "@persista/ranking": ["./packages/ranking/src"],
+      "@persista/graph": ["./packages/graph/src"],
+      "@persista/config": ["./packages/config/src"]
     }
   }
 }
