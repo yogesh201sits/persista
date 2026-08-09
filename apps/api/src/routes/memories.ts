@@ -32,4 +32,18 @@ memories.post(
   },
 );
 
+memories.delete(
+  "/:id",
+  async (c) => {
+    const id =
+      c.req.param("id");
+
+    await memoryManager.delete(id);
+
+    return c.json({
+      success: true,
+    });
+  },
+);
+
 export default memories;

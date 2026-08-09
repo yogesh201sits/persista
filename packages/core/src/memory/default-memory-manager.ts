@@ -122,4 +122,10 @@ export class DefaultMemoryManager
       options,
     );
   }
+
+  async delete(
+    id: string,
+  ): Promise<void> {
+    await this.vectorStore.delete(id);
+  }
 }
