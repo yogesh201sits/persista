@@ -265,48 +265,53 @@ export class Neo4jGraphStore
   }
 
   async findEntity(
-    name: string,
-    type: string,
-  ): Promise<Entity | null> {
-    const session =
-      this.driver.session();
+  name: string,
+  type?: string,
+): Promise<Entity | null> {
+  const session =
+    this.driver.session({
+      database: this.database,
+    });
 
-    try {
-      const result =
-        await session.run(
-          `
-          MATCH (e:Entity)
-          WHERE
-            toLower(e.name) = toLower($name)
-            AND
-            toLower(e.type) = toLower($type)
-          RETURN e
-          LIMIT 1
-          `,
-          {
-            name,
-            type,
-          },
-        );
+  try {
+    const result =
+      await session.run(
+        `
+        MATCH (e:Entity)
+        WHERE
+          toLower(e.name) = toLower($name)
+          AND (
+            $type IS NULL
+            OR toLower(e.type) = toLower($type)
+          )
+        RETURN e
+        LIMIT 1
+        `,
+        {
+          name,
+          type: type ?? null,
+        },
+      );
 
-      if (result.records.length === 0) {
-        return null;
-      }
-
-      const node =
-        result.records[0].get("e");
-
-      return {
-        id: node.properties.id,
-        name: node.properties.name,
-        type: node.properties.type,
-        metadata:
-          node.properties.metadata,
-      };
-    } finally {
-      await session.close();
+    if (result.records.length === 0) {
+      return null;
     }
+
+    const node =
+      result.records[0].get("e");
+
+    return {
+      id: node.properties.id,
+      name: node.properties.name,
+      type: node.properties.type,
+      metadata: JSON.parse(
+        node.properties.metadata,
+),
+    };
+  } finally {
+    await session.close();
   }
+}
 
   async findRelationship(
   sourceId: string,
@@ -314,7 +319,9 @@ export class Neo4jGraphStore
   type: string,
 ): Promise<Relationship | null> {
   const session =
-    this.driver.session();
+    this.driver.session({
+      database: this.database,
+  });
 
   try {
     const result =
@@ -359,8 +366,9 @@ export class Neo4jGraphStore
       type: relationship.properties.type,
       confidence:
         relationship.properties.confidence,
-      metadata:
+      metadata: JSON.parse(
         relationship.properties.metadata,
+      ),
     };
   } finally {
     await session.close();

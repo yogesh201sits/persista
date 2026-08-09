@@ -1,0 +1,7 @@
+import type { GraphRetrievalResult } from "../models";
+
+export interface GraphRetrievalEngine {
+  search(
+    entityName: string,
+  ): Promise<GraphRetrievalResult | null>;
+}

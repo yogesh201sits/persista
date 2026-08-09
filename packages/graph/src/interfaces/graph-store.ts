@@ -15,7 +15,7 @@ export interface GraphStore {
 
   findEntity(
     name: string,
-    type: string,
+    type?: string,
   ): Promise<Entity | null>;
 
   findRelationship(

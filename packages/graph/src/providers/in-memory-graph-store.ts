@@ -81,20 +81,45 @@ export class InMemoryGraphStore
   }
 
   async findEntity(
-    name: string,
-    type: string,
-  ): Promise<Entity | null> {
-    for (const entity of this.entities.values()) {
-      if (
-        entity.name.toLowerCase() ===
-          name.toLowerCase() &&
-        entity.type.toLowerCase() ===
-          type.toLowerCase()
-      ) {
-        return entity;
-      }
-    }
+  name: string,
+  type?: string,
+): Promise<Entity | null> {
+  for (const entity of this.entities.values()) {
+    const nameMatches =
+      entity.name.toLowerCase() ===
+      name.toLowerCase();
 
-    return null;
+    const typeMatches =
+      !type ||
+      entity.type.toLowerCase() ===
+        type.toLowerCase();
+
+    if (
+      nameMatches &&
+      typeMatches
+    ) {
+      return entity;
+    }
   }
+
+  return null;
+}
+async findRelationship(
+  sourceId: string,
+  targetId: string,
+  type: string,
+): Promise<Relationship | null> {
+  for (const relationship of this.relationships.values()) {
+    if (
+      relationship.sourceId === sourceId &&
+      relationship.targetId === targetId &&
+      relationship.type.toLowerCase() ===
+        type.toLowerCase()
+    ) {
+      return relationship;
+    }
+  }
+
+  return null;
+}
 }
