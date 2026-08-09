@@ -13,12 +13,14 @@ export interface Neo4jGraphStoreOptions {
   uri: string;
   username: string;
   password: string;
+  database?: string;
 }
 
 export class Neo4jGraphStore
   implements GraphStore
 {
   private readonly driver: Driver;
+  private readonly database: string;
 
   constructor(
     options: Neo4jGraphStoreOptions,
@@ -30,13 +32,22 @@ export class Neo4jGraphStore
         options.password,
       ),
     );
+
+    this.database =
+      options.database ?? "75ab4bc5";
+  }
+
+  async connect(): Promise<void> {
+    await this.driver.verifyConnectivity();
   }
 
   async upsertEntity(
     entity: Entity,
   ): Promise<void> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       await session.run(
@@ -51,8 +62,9 @@ export class Neo4jGraphStore
           id: entity.id,
           name: entity.name,
           type: entity.type,
-          metadata:
+          metadata: JSON.stringify(
             entity.metadata ?? {},
+          ),
         },
       );
     } finally {
@@ -64,7 +76,9 @@ export class Neo4jGraphStore
     relationship: Relationship,
   ): Promise<void> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       await session.run(
@@ -94,8 +108,9 @@ export class Neo4jGraphStore
           type: relationship.type,
           confidence:
             relationship.confidence,
-          metadata:
+          metadata: JSON.stringify(
             relationship.metadata ?? {},
+          ),
         },
       );
     } finally {
@@ -107,7 +122,9 @@ export class Neo4jGraphStore
     id: string,
   ): Promise<Entity | null> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       const result =
@@ -124,15 +141,15 @@ export class Neo4jGraphStore
       }
 
       const node =
-        result.records[0]
-          .get("e");
+        result.records[0].get("e");
 
       return {
         id: node.properties.id,
         name: node.properties.name,
         type: node.properties.type,
-        metadata:
+        metadata: JSON.parse(
           node.properties.metadata,
+        ),
       };
     } finally {
       await session.close();
@@ -143,7 +160,9 @@ export class Neo4jGraphStore
     entityId: string,
   ): Promise<Relationship[]> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       const result =
@@ -172,8 +191,7 @@ export class Neo4jGraphStore
 
           return {
             id:
-              relationship
-                .properties.id,
+              relationship.properties.id,
 
             sourceId:
               record.get("sourceId"),
@@ -182,16 +200,16 @@ export class Neo4jGraphStore
               record.get("targetId"),
 
             type:
-              relationship
-                .properties.type,
+              relationship.properties.type,
 
             confidence:
-              relationship
-                .properties.confidence,
+              relationship.properties
+                .confidence,
 
-            metadata:
-              relationship
-                .properties.metadata,
+            metadata: JSON.parse(
+              relationship.properties
+                .metadata,
+            ),
           };
         },
       );
@@ -204,7 +222,9 @@ export class Neo4jGraphStore
     id: string,
   ): Promise<void> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       await session.run(
@@ -223,7 +243,9 @@ export class Neo4jGraphStore
     id: string,
   ): Promise<void> {
     const session =
-      this.driver.session();
+      this.driver.session({
+        database: this.database,
+      });
 
     try {
       await session.run(
