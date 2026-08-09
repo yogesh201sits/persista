@@ -1,5 +1,5 @@
 import type { PersistaClientOptions } from "../config";
-import { MemorySDKError } from "../errors";
+import { PersistaSDKError } from "../errors";
 import type { Conversation } from "@persista/shared";
 
 export interface SearchOptions {
@@ -84,7 +84,7 @@ export class PersistaClient {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new MemorySDKError(
+        throw new PersistaSDKError(
           data?.error?.message ??
             "Request failed.",
           response.status,
@@ -93,7 +93,7 @@ export class PersistaClient {
 
       return data as T;
     } catch (error) {
-      if (error instanceof MemorySDKError) {
+      if (error instanceof PersistaSDKError) {
         throw error;
       }
 
@@ -101,12 +101,12 @@ export class PersistaClient {
         error instanceof DOMException &&
         error.name === "AbortError"
       ) {
-        throw new MemorySDKError(
+        throw new PersistaSDKError(
           "Request timed out.",
         );
       }
 
-      throw new MemorySDKError(
+      throw new PersistaSDKError(
         error instanceof Error
           ? error.message
           : "Request failed.",

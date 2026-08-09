@@ -1,4 +1,4 @@
-export class MemorySDKError extends Error {
+export class PersistaSDKError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,

@@ -2,6 +2,8 @@ import { describe, expect, test, mock } from "bun:test";
 
 import { PersistaClient } from "../src";
 
+import { PersistaSDKError } from "../src";
+
 describe("PersistaClient", () => {
   test("uses default options", () => {
     const client = new PersistaClient();
@@ -119,5 +121,55 @@ test("sends a remember request", async () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   } finally {
     globalThis.fetch = fetch;
+  }
+});
+
+test("throws PersistaSDKError for failed requests", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async () => {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Request validation failed.",
+        },
+      }),
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as unknown as typeof fetch;
+
+  try {
+    const client = new PersistaClient();
+
+    await expect(
+      client.remember({
+        messages: [],
+      }),
+    ).rejects.toBeInstanceOf(PersistaSDKError);
+
+    try {
+      await client.remember({
+        messages: [],
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(PersistaSDKError);
+
+      const sdkError = error as PersistaSDKError;
+
+      expect(sdkError.message).toBe(
+        "Request validation failed.",
+      );
+
+      expect(sdkError.statusCode).toBe(400);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 });
