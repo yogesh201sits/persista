@@ -168,4 +168,53 @@ describe("GraphMemoryManager", () => {
       relationshipTypes,
     ).toContain("Building");
   });
+  it("should reuse existing entities", async () => {
+    const firstConversation: Conversation = {
+      messages: [
+        {
+          role: "user",
+          content:
+            "My name is Yogesh. I prefer Bun.",
+        },
+      ],
+    };
+
+    await manager.remember(
+      firstConversation,
+    );
+
+    const firstBun =
+      await graphStore.findEntity(
+        "Bun",
+        "Technology",
+      );
+
+    expect(firstBun).not.toBeNull();
+
+    const secondConversation: Conversation = {
+      messages: [
+        {
+          role: "user",
+          content:
+            "I still prefer Bun.",
+        },
+      ],
+    };
+
+    await manager.remember(
+      secondConversation,
+    );
+
+    const secondBun =
+      await graphStore.findEntity(
+        "Bun",
+        "Technology",
+      );
+
+    expect(secondBun).not.toBeNull();
+
+    expect(secondBun!.id).toBe(
+      firstBun!.id,
+    );
+  });
 });
