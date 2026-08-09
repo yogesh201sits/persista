@@ -4,8 +4,10 @@ import type {
 
 import type {
   VectorSearchOptions,
-  VectorSearchResult,
+  VectorSearchResult,VectorMemory
 } from "@persista/vector-store";
+
+import { MemoryUpdate } from "../models";
 
 export interface MemoryManager {
   remember(
@@ -19,5 +21,9 @@ export interface MemoryManager {
 
   delete(
     id: string,
+  ): Promise<void>;
+
+  update(
+    memory:  MemoryUpdate,
   ): Promise<void>;
 }

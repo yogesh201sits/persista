@@ -19,6 +19,8 @@ import type {
   RetrievalEngine,
 } from "@persista/ranking";
 
+import { MemoryUpdate } from "../models";
+
 import type { MemoryManager } from "./memory-manager";
 
 export class DefaultMemoryManager
@@ -127,5 +129,35 @@ export class DefaultMemoryManager
     id: string,
   ): Promise<void> {
     await this.vectorStore.delete(id);
+  }
+
+  async update(
+    memory: MemoryUpdate,
+  ): Promise<void> {
+    const embedding =
+      await this.embeddingProvider.embed(
+        memory.content,
+      );
+
+    await this.vectorStore.upsert({
+      id: memory.id,
+
+      embedding,
+
+      metadata: {
+        content: memory.content,
+        type: memory.type,
+        confidence: memory.confidence,
+
+        createdAt:
+          new Date().toISOString(),
+
+        ...(memory.value !== undefined
+          ? {
+              value: memory.value,
+            }
+          : {}),
+      },
+    });
   }
 }
