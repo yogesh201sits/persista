@@ -10,6 +10,10 @@ import type {
   VectorSearchResult,
 } from "@persista/vector-store";
 
+import type {
+  MemoryDeduplicator,
+} from "../deduplication/memory-deduplicator";
+
 import type { Extractor } from "@persista/extractor";
 import type {
   RetrievalEngine,
@@ -25,6 +29,7 @@ export class DefaultMemoryManager
     private readonly embeddingProvider: EmbeddingProvider,
     private readonly vectorStore: VectorStore,
     private readonly retrievalEngine: RetrievalEngine,
+    private readonly deduplicator: MemoryDeduplicator,
   ) {}
 
   async remember(
@@ -56,16 +61,38 @@ export class DefaultMemoryManager
       i++
     ) {
       const memory = result.memories[i];
+      const embedding = embeddings[i];
+
+      const duplicates =
+        await this.vectorStore.search(
+          embedding,
+          {
+            limit: 1,
+            minScore: 0.95,
+          },
+        );
+
+      if (
+        this.deduplicator.isDuplicate(
+          duplicates,
+        )
+      ) {
+        continue;
+      }
 
       vectorMemories.push({
         id: crypto.randomUUID(),
-        embedding: embeddings[i],
+
+        embedding,
+
         metadata: {
           content: memory.content,
           type: memory.type,
           confidence: memory.confidence,
+
           createdAt:
             new Date().toISOString(),
+
           ...(memory.value !== undefined
             ? {
                 value: memory.value,
@@ -75,6 +102,10 @@ export class DefaultMemoryManager
           ...(memory.metadata ?? {}),
         },
       });
+    }
+
+    if (vectorMemories.length === 0) {
+      return;
     }
 
     await this.vectorStore.upsertBatch(
