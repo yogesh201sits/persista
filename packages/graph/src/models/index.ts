@@ -1,2 +1,3 @@
-export type { Entity } from "./entity";
-export type { Relationship } from "./relationship";
+export * from "./entity";
+export * from "./relationship";
+export * from "./extraction";
