@@ -1,29 +1,16 @@
+import type { Conversation } from "@persista/shared";
+import type {
+  VectorSearchFilter,
+  VectorSearchResult,
+} from "@persista/vector-store";
+
 import type { PersistaClientOptions } from "../config";
 import { PersistaSDKError } from "../errors";
-import type { Conversation } from "@persista/shared";
 
 export interface SearchOptions {
   limit?: number;
   minScore?: number;
-  filter?: Record<string, unknown>;
-}
-
-export interface SearchResult {
-  id: string;
-  score: number;
-  metadata: {
-    content: string;
-    type:
-      | "fact"
-      | "identity"
-      | "preference"
-      | "goal"
-      | "relationship";
-    confidence: number;
-    value?: string;
-    createdAt: string;
-    [key: string]: unknown;
-  };
+  filter?: VectorSearchFilter[];
 }
 
 export interface UpdateMemoryInput {
@@ -42,7 +29,9 @@ export interface UpdateMemoryInput {
 export class PersistaClient {
   readonly options: Required<PersistaClientOptions>;
 
-  constructor(options: PersistaClientOptions = {}) {
+  constructor(
+    options: PersistaClientOptions = {},
+  ) {
     this.options = {
       apiKey: options.apiKey ?? "",
       baseUrl:
@@ -56,7 +45,8 @@ export class PersistaClient {
     path: string,
     options: RequestInit = {},
   ): Promise<T> {
-    const controller = new AbortController();
+    const controller =
+      new AbortController();
 
     const timeout = setTimeout(() => {
       controller.abort();
@@ -93,7 +83,9 @@ export class PersistaClient {
 
       return data as T;
     } catch (error) {
-      if (error instanceof PersistaSDKError) {
+      if (
+        error instanceof PersistaSDKError
+      ) {
         throw error;
       }
 
@@ -119,7 +111,7 @@ export class PersistaClient {
   async remember(
     conversation: Conversation,
   ): Promise<void> {
-    await this.request<void>(
+    await this.request(
       "/memories",
       {
         method: "POST",
@@ -133,64 +125,31 @@ export class PersistaClient {
   async search(
     query: string,
     options?: SearchOptions,
-  ): Promise<SearchResult[]> {
-    const params = new URLSearchParams();
-
-    params.set("query", query);
-
-    if (options?.limit !== undefined) {
-      params.set(
-        "limit",
-        String(options.limit),
+  ): Promise<VectorSearchResult[]> {
+    const response =
+      await this.request<{
+        success: boolean;
+        results: VectorSearchResult[];
+      }>(
+        "/memories/search",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            query,
+            limit: options?.limit,
+            minScore: options?.minScore,
+            filter: options?.filter,
+          }),
+        },
       );
-    }
 
-    if (options?.minScore !== undefined) {
-      params.set(
-        "minScore",
-        String(options.minScore),
-      );
-    }
-
-    if (options?.filter !== undefined) {
-      params.set(
-        "filter",
-        JSON.stringify(options.filter),
-      );
-    }
-
-    // const response = await this.request<{
-    //   data: SearchResult[];
-    // }>(
-    //   `/memories/search?${params.toString()}`,
-    //   {
-    //     method: "GET",
-    //   },
-    // );
-
-    // return response.data;
-    const response = await this.request<{
-    data: SearchResult[];
-  }>(
-    "/memories/search",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        query,
-        limit: options?.limit,
-        minScore: options?.minScore,
-        filter: options?.filter,
-      }),
-    },
-  );
-
-  return response.data;
+    return response.results;
   }
 
   async update(
     memory: UpdateMemoryInput,
   ): Promise<void> {
-    await this.request<void>(
+    await this.request(
       `/memories/${memory.id}`,
       {
         method: "PUT",
@@ -207,12 +166,11 @@ export class PersistaClient {
   async delete(
     id: string,
   ): Promise<void> {
-    await this.request<void>(
+    await this.request(
       `/memories/${id}`,
       {
         method: "DELETE",
       },
     );
   }
-
 }

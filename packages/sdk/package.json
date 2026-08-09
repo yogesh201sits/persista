@@ -4,8 +4,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
-   "dependencies": {
-    "@persista/shared": "workspace:*"
+  "dependencies": {
+    "@persista/shared": "workspace:*",
+    "@persista/vector-store": "workspace:*"
   },
   "type": "module",
   "main": "./dist/index.js",
