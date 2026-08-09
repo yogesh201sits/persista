@@ -46,33 +46,46 @@ export class DefaultMemoryManager
       return;
     }
 
-    const texts = result.memories.map(
-      (memory) => memory.content,
-    );
+    const texts =
+      result.memories.map(
+        (memory) => memory.content,
+      );
 
     const embeddings =
       await this.embeddingProvider.embedBatch(
         texts,
       );
 
-    const vectorMemories: VectorMemory[] = [];
+    const duplicateResults =
+      await Promise.all(
+        embeddings.map(
+          (embedding) =>
+            this.vectorStore.search(
+              embedding,
+              {
+                limit: 1,
+                minScore: 0.95,
+              },
+            ),
+        ),
+      );
+
+    const vectorMemories:
+      VectorMemory[] = [];
 
     for (
       let i = 0;
       i < result.memories.length;
       i++
     ) {
-      const memory = result.memories[i];
-      const embedding = embeddings[i];
+      const memory =
+        result.memories[i];
+
+      const embedding =
+        embeddings[i];
 
       const duplicates =
-        await this.vectorStore.search(
-          embedding,
-          {
-            limit: 1,
-            minScore: 0.95,
-          },
-        );
+        duplicateResults[i];
 
       if (
         this.deduplicator.isDuplicate(
@@ -90,7 +103,8 @@ export class DefaultMemoryManager
         metadata: {
           content: memory.content,
           type: memory.type,
-          confidence: memory.confidence,
+          confidence:
+            memory.confidence,
 
           createdAt:
             new Date().toISOString(),
