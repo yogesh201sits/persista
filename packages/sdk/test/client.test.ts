@@ -394,3 +394,42 @@ test("sends api key and custom headers", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("throws an error when request times out", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async (
+    _input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => {
+    return new Promise<Response>((_, reject) => {
+      init?.signal?.addEventListener(
+        "abort",
+        () => {
+          reject(
+            new DOMException(
+              "The operation was aborted.",
+              "AbortError",
+            ),
+          );
+        },
+      );
+    });
+  }) as typeof fetch;
+
+  try {
+    const client = new PersistaClient({
+      timeout: 10,
+    });
+
+    await expect(
+      client.remember({
+        messages: [],
+      }),
+    ).rejects.toMatchObject({
+      message: "Request timed out.",
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
