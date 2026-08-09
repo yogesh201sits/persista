@@ -5,6 +5,10 @@ import {
   LangChainProvider,
 } from "@persista/extractor";
 
+import {
+  DefaultMemoryDeduplicator,
+} from "@persista/core";
+
 import { HuggingFaceProvider } from "@persista/embeddings";
 
 import { QdrantVectorStore } from "@persista/vector-store";
@@ -70,6 +74,10 @@ const vectorStore =
 const rankingStrategy =
   new DefaultRankingStrategy();
 
+const deduplicator =
+  new DefaultMemoryDeduplicator({
+    threshold: 0.95,
+  });
 
 const retrievalEngine =
   new DefaultRetrievalEngine(
@@ -85,4 +93,5 @@ export const memoryManager =
     embeddingProvider,
     vectorStore,
     retrievalEngine,
+    deduplicator
   );

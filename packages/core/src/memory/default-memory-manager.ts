@@ -10,10 +10,16 @@ import type {
   VectorSearchResult,
 } from "@persista/vector-store";
 
+import type {
+  MemoryDeduplicator,
+} from "../deduplication/memory-deduplicator";
+
 import type { Extractor } from "@persista/extractor";
 import type {
   RetrievalEngine,
 } from "@persista/ranking";
+
+import { MemoryUpdate } from "../models";
 
 import type { MemoryManager } from "./memory-manager";
 
@@ -25,6 +31,7 @@ export class DefaultMemoryManager
     private readonly embeddingProvider: EmbeddingProvider,
     private readonly vectorStore: VectorStore,
     private readonly retrievalEngine: RetrievalEngine,
+    private readonly deduplicator: MemoryDeduplicator,
   ) {}
 
   async remember(
@@ -39,33 +46,69 @@ export class DefaultMemoryManager
       return;
     }
 
-    const texts = result.memories.map(
-      (memory) => memory.content,
-    );
+    const texts =
+      result.memories.map(
+        (memory) => memory.content,
+      );
 
     const embeddings =
       await this.embeddingProvider.embedBatch(
         texts,
       );
 
-    const vectorMemories: VectorMemory[] = [];
+    const duplicateResults =
+      await Promise.all(
+        embeddings.map(
+          (embedding) =>
+            this.vectorStore.search(
+              embedding,
+              {
+                limit: 1,
+                minScore: 0.95,
+              },
+            ),
+        ),
+      );
+
+    const vectorMemories:
+      VectorMemory[] = [];
 
     for (
       let i = 0;
       i < result.memories.length;
       i++
     ) {
-      const memory = result.memories[i];
+      const memory =
+        result.memories[i];
+
+      const embedding =
+        embeddings[i];
+
+      const duplicates =
+        duplicateResults[i];
+
+      if (
+        this.deduplicator.isDuplicate(
+          duplicates,
+        )
+      ) {
+        continue;
+      }
 
       vectorMemories.push({
         id: crypto.randomUUID(),
-        embedding: embeddings[i],
+
+        embedding,
+
         metadata: {
           content: memory.content,
           type: memory.type,
-          confidence: memory.confidence,
+          confidence:
+            memory.confidence,
+
           createdAt:
             new Date().toISOString(),
+
           ...(memory.value !== undefined
             ? {
                 value: memory.value,
@@ -75,6 +118,10 @@ export class DefaultMemoryManager
           ...(memory.metadata ?? {}),
         },
       });
+    }
+
+    if (vectorMemories.length === 0) {
+      return;
     }
 
     await this.vectorStore.upsertBatch(
@@ -90,5 +137,41 @@ export class DefaultMemoryManager
       query,
       options,
     );
+  }
+
+  async delete(
+    id: string,
+  ): Promise<void> {
+    await this.vectorStore.delete(id);
+  }
+
+  async update(
+    memory: MemoryUpdate,
+  ): Promise<void> {
+    const embedding =
+      await this.embeddingProvider.embed(
+        memory.content,
+      );
+
+    await this.vectorStore.upsert({
+      id: memory.id,
+
+      embedding,
+
+      metadata: {
+        content: memory.content,
+        type: memory.type,
+        confidence: memory.confidence,
+
+        createdAt:
+          new Date().toISOString(),
+
+        ...(memory.value !== undefined
+          ? {
+              value: memory.value,
+            }
+          : {}),
+      },
+    });
   }
 }

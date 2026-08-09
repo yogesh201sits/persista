@@ -1,5 +1,10 @@
-import type { Context } from "hono";
+import type {
+  Context,
+} from "hono";
+
 import { AppError } from "../errors/app-error";
+
+import { logger } from "./logger";
 
 export const errorMiddleware = (
   err: Error,
@@ -8,17 +13,35 @@ export const errorMiddleware = (
   if (err instanceof AppError) {
     return c.json(
       {
-        error: err.message,
+        success: false,
+
+        error: {
+          code: err.statusCode,
+          message: err.message,
+        },
       },
       err.statusCode,
     );
   }
 
-  console.error(err);
+  logger.error(
+    {
+      error: err,
+      requestId:
+        c.get("requestId"),
+    },
+    "Unhandled request error",
+  );
 
   return c.json(
     {
-      error: "Internal server error",
+      success: false,
+
+      error: {
+        code: "INTERNAL_SERVER_ERROR",
+        message:
+          "An unexpected error occurred.",
+      },
     },
     500,
   );
