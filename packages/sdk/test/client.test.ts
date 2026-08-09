@@ -349,3 +349,48 @@ test("sends a delete request", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("sends api key and custom headers", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => {
+    expect(input).toBe(
+      "https://api.example.com/memories",
+    );
+
+    expect(init?.headers).toEqual({
+      "Content-Type": "application/json",
+      "X-Client-Version": "0.1.0",
+      Authorization: "Bearer test-key",
+    });
+
+    return new Response(
+      JSON.stringify({}),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    const client = new PersistaClient({
+      baseUrl: "https://api.example.com",
+      apiKey: "test-key",
+      headers: {
+        "X-Client-Version": "0.1.0",
+      },
+    });
+
+    await client.remember({
+      messages: [],
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
