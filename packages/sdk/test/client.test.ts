@@ -173,3 +173,179 @@ test("throws PersistaSDKError for failed requests", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("sends a search request and returns results", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => {
+    expect(input).toBe(
+      "http://localhost:3000/memories/search",
+    );
+
+    expect(init?.method).toBe("POST");
+
+    expect(init?.headers).toEqual({
+      "Content-Type": "application/json",
+    });
+
+    expect(init?.body).toBe(
+      JSON.stringify({
+        query: "TypeScript",
+        limit: 5,
+        minScore: 0.7,
+        filter: {
+          type: "preference",
+        },
+      }),
+    );
+
+    return new Response(
+      JSON.stringify({
+        data: [
+          {
+            id: "memory-1",
+            score: 0.92,
+            metadata: {
+              content: "I prefer TypeScript",
+              type: "preference",
+              confidence: 0.98,
+              value: "TypeScript",
+              createdAt: "2026-08-09T10:00:00.000Z",
+            },
+          },
+        ],
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    const client = new PersistaClient();
+
+    const results = await client.search(
+      "TypeScript",
+      {
+        limit: 5,
+        minScore: 0.7,
+        filter: {
+          type: "preference",
+        },
+      },
+    );
+
+    expect(results).toEqual([
+      {
+        id: "memory-1",
+        score: 0.92,
+        metadata: {
+          content: "I prefer TypeScript",
+          type: "preference",
+          confidence: 0.98,
+          value: "TypeScript",
+          createdAt: "2026-08-09T10:00:00.000Z",
+        },
+      },
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("sends an update request", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => {
+    expect(input).toBe(
+      "http://localhost:3000/memories/memory-1",
+    );
+
+    expect(init?.method).toBe("PUT");
+
+    expect(init?.headers).toEqual({
+      "Content-Type": "application/json",
+    });
+
+    expect(init?.body).toBe(
+      JSON.stringify({
+        content: "I prefer Bun",
+        type: "preference",
+        confidence: 1,
+        value: "Bun",
+      }),
+    );
+
+    return new Response(
+      JSON.stringify({}),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    const client = new PersistaClient();
+
+    await client.update({
+      id: "memory-1",
+      content: "I prefer Bun",
+      type: "preference",
+      confidence: 1,
+      value: "Bun",
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("sends a delete request", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (async (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => {
+    expect(input).toBe(
+      "http://localhost:3000/memories/memory-1",
+    );
+
+    expect(init?.method).toBe("DELETE");
+
+    expect(init?.headers).toEqual({
+      "Content-Type": "application/json",
+    });
+
+    expect(init?.body).toBeUndefined();
+
+    return new Response(
+      JSON.stringify({}),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    const client = new PersistaClient();
+
+    await client.delete("memory-1");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
