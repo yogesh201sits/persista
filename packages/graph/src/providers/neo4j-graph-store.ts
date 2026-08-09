@@ -263,4 +263,48 @@ export class Neo4jGraphStore
   async close(): Promise<void> {
     await this.driver.close();
   }
+
+  async findEntity(
+    name: string,
+    type: string,
+  ): Promise<Entity | null> {
+    const session =
+      this.driver.session();
+
+    try {
+      const result =
+        await session.run(
+          `
+          MATCH (e:Entity)
+          WHERE
+            toLower(e.name) = toLower($name)
+            AND
+            toLower(e.type) = toLower($type)
+          RETURN e
+          LIMIT 1
+          `,
+          {
+            name,
+            type,
+          },
+        );
+
+      if (result.records.length === 0) {
+        return null;
+      }
+
+      const node =
+        result.records[0].get("e");
+
+      return {
+        id: node.properties.id,
+        name: node.properties.name,
+        type: node.properties.type,
+        metadata:
+          node.properties.metadata,
+      };
+    } finally {
+      await session.close();
+    }
+  }
 }

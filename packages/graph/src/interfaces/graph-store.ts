@@ -12,4 +12,9 @@ export interface GraphStore {
   deleteEntity(id: string): Promise<void>;
 
   deleteRelationship(id: string): Promise<void>;
+
+  findEntity(
+    name: string,
+    type: string,
+  ): Promise<Entity | null>;
 }

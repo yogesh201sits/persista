@@ -79,4 +79,22 @@ export class InMemoryGraphStore
   ): Promise<void> {
     this.relationships.delete(id);
   }
+
+  async findEntity(
+    name: string,
+    type: string,
+  ): Promise<Entity | null> {
+    for (const entity of this.entities.values()) {
+      if (
+        entity.name.toLowerCase() ===
+          name.toLowerCase() &&
+        entity.type.toLowerCase() ===
+          type.toLowerCase()
+      ) {
+        return entity;
+      }
+    }
+
+    return null;
+  }
 }
