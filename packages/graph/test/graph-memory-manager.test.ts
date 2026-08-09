@@ -217,4 +217,54 @@ describe("GraphMemoryManager", () => {
       firstBun!.id,
     );
   });
+  it("should not duplicate relationships", async () => {
+  const conversation: Conversation = {
+    messages: [
+      {
+        role: "user",
+        content:
+          "My name is Yogesh. I prefer Bun.",
+      },
+    ],
+  };
+
+  await manager.remember(
+    conversation,
+  );
+
+  const bun =
+    await graphStore.findEntity(
+      "Bun",
+      "Technology",
+    );
+
+  const yogesh =
+    await graphStore.findEntity(
+      "Yogesh",
+      "Person",
+    );
+
+  expect(bun).not.toBeNull();
+  expect(yogesh).not.toBeNull();
+
+  const firstRelationships =
+    await graphStore.getRelationships(
+      yogesh!.id,
+    );
+
+  await manager.remember(
+    conversation,
+  );
+
+  const secondRelationships =
+    await graphStore.getRelationships(
+      yogesh!.id,
+    );
+
+  expect(
+    secondRelationships.length,
+  ).toBe(
+    firstRelationships.length,
+  );
+});
 });

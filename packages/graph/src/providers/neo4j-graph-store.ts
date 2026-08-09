@@ -307,4 +307,63 @@ export class Neo4jGraphStore
       await session.close();
     }
   }
+
+  async findRelationship(
+  sourceId: string,
+  targetId: string,
+  type: string,
+): Promise<Relationship | null> {
+  const session =
+    this.driver.session();
+
+  try {
+    const result =
+      await session.run(
+        `
+        MATCH (
+          source:Entity
+        )-[r:RELATED_TO]->(
+          target:Entity
+        )
+        WHERE
+          source.id = $sourceId
+          AND target.id = $targetId
+          AND toLower(r.type) = toLower($type)
+        RETURN
+          r,
+          source.id AS sourceId,
+          target.id AS targetId
+        LIMIT 1
+        `,
+        {
+          sourceId,
+          targetId,
+          type,
+        },
+      );
+
+    if (result.records.length === 0) {
+      return null;
+    }
+
+    const record =
+      result.records[0];
+
+    const relationship =
+      record.get("r");
+
+    return {
+      id: relationship.properties.id,
+      sourceId: record.get("sourceId"),
+      targetId: record.get("targetId"),
+      type: relationship.properties.type,
+      confidence:
+        relationship.properties.confidence,
+      metadata:
+        relationship.properties.metadata,
+    };
+  } finally {
+    await session.close();
+  }
+}
 }

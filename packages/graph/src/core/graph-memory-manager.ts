@@ -38,33 +38,44 @@ export class GraphMemoryManager {
       );
     }
 
-    for (
-      const extraction of result.relationships
-    ) {
-      const sourceId =
-        entityIds.get(
-          extraction.source.toLowerCase(),
-        );
+  for (
+  const extraction of result.relationships
+) {
+  const sourceId =
+    entityIds.get(
+      extraction.source.toLowerCase(),
+    );
 
-      const targetId =
-        entityIds.get(
-          extraction.target.toLowerCase(),
-        );
+  const targetId =
+    entityIds.get(
+      extraction.target.toLowerCase(),
+    );
 
-      if (!sourceId || !targetId) {
-        continue;
-      }
+  if (!sourceId || !targetId) {
+    continue;
+  }
 
-      await this.graphStore.upsertRelationship(
-        {
-          id: crypto.randomUUID(),
-          sourceId,
-          targetId,
-          type: extraction.type,
-          confidence:
-            extraction.confidence,
-        },
-      );
-    }
+  const existing =
+    await this.graphStore.findRelationship(
+      sourceId,
+      targetId,
+      extraction.type,
+    );
+
+  if (existing) {
+    continue;
+  }
+
+  await this.graphStore.upsertRelationship(
+    {
+      id: crypto.randomUUID(),
+      sourceId,
+      targetId,
+      type: extraction.type,
+      confidence:
+        extraction.confidence,
+    },
+  );
+}
   }
 }
