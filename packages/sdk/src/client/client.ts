@@ -13,6 +13,35 @@ export interface SearchOptions {
   filter?: VectorSearchFilter[];
 }
 
+export interface GraphSearchResult {
+  entity: {
+    id: string;
+    name: string;
+    type: string;
+    metadata?: Record<string, unknown>;
+  };
+
+  relationships: Array<{
+    relationship: {
+      id: string;
+      sourceId: string;
+      targetId: string;
+      type: string;
+      confidence: number;
+      metadata?: Record<string, unknown>;
+    };
+
+    entity: {
+      id: string;
+      name: string;
+      type: string;
+      metadata?: Record<string, unknown>;
+    };
+
+    depth: number;
+  }>;
+}
+
 export interface UpdateMemoryInput {
   id: string;
   content: string;
@@ -172,5 +201,24 @@ export class PersistaClient {
         method: "DELETE",
       },
     );
+  }
+  async graphSearch(
+    entity: string,
+  ): Promise<GraphSearchResult | null> {
+    const response =
+      await this.request<{
+        success: boolean;
+        result: GraphSearchResult | null;
+      }>(
+        "/memories/graph/search",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            entity,
+          }),
+        },
+      );
+
+    return response.result;
   }
 }
