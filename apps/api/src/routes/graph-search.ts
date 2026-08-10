@@ -21,11 +21,13 @@ graphSearch.post(
     const body =
       c.get("body") as {
         entity: string;
+        depth?: number;
       };
 
     const result =
       await graphRetrievalEngine.search(
         body.entity,
+        body.depth,
       );
 
     return c.json({

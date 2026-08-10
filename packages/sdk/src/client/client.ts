@@ -7,39 +7,14 @@ import type {
 import type { PersistaClientOptions } from "../config";
 import { PersistaSDKError } from "../errors";
 
+import type {
+  GraphSearchResult,
+} from "@persista/graph";
+
 export interface SearchOptions {
   limit?: number;
   minScore?: number;
   filter?: VectorSearchFilter[];
-}
-
-export interface GraphSearchResult {
-  entity: {
-    id: string;
-    name: string;
-    type: string;
-    metadata?: Record<string, unknown>;
-  };
-
-  relationships: Array<{
-    relationship: {
-      id: string;
-      sourceId: string;
-      targetId: string;
-      type: string;
-      confidence: number;
-      metadata?: Record<string, unknown>;
-    };
-
-    entity: {
-      id: string;
-      name: string;
-      type: string;
-      metadata?: Record<string, unknown>;
-    };
-
-    depth: number;
-  }>;
 }
 
 export interface UpdateMemoryInput {
@@ -53,6 +28,10 @@ export interface UpdateMemoryInput {
     | "relationship";
   confidence: number;
   value?: string;
+}
+
+export interface GraphSearchOptions {
+  depth?: number;
 }
 
 export class PersistaClient {
@@ -204,6 +183,7 @@ export class PersistaClient {
   }
   async graphSearch(
     entity: string,
+    options?: GraphSearchOptions,
   ): Promise<GraphSearchResult | null> {
     const response =
       await this.request<{
@@ -215,6 +195,7 @@ export class PersistaClient {
           method: "POST",
           body: JSON.stringify({
             entity,
+            depth: options?.depth,
           }),
         },
       );

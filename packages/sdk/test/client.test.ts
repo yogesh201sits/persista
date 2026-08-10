@@ -1,4 +1,4 @@
-import { describe, expect, test, mock } from "bun:test";
+import { describe, expect, test, mock, it } from "bun:test";
 
 import { PersistaClient } from "../src";
 
@@ -347,4 +347,86 @@ test("throws an error when request times out", async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
+  
 });
+it(
+  "sends a graph search request",
+  async () => {
+    const originalFetch =
+      globalThis.fetch;
+
+    globalThis.fetch =
+      (async (
+        input: RequestInfo | URL,
+        options?: RequestInit,
+      ) => {
+        expect(
+          input.toString(),
+        ).toContain(
+          "/memories/graph/search",
+        );
+
+        expect(
+          options?.method,
+        ).toBe("POST");
+
+        expect(
+          options?.body,
+        ).toBe(
+          JSON.stringify({
+            entity: "CodePilot",
+          }),
+        );
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            result: {
+              entity: {
+                id: "codepilot-id",
+                name: "CodePilot",
+                type: "project",
+                metadata: {
+                  confidence: 1,
+                },
+              },
+              relationships: [],
+            },
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+          },
+        );
+      }) as typeof fetch;
+
+    try {
+      const client =
+        new PersistaClient({
+          baseUrl:
+            "http://localhost:3000",
+        });
+
+      const result =
+        await client.graphSearch(
+          "CodePilot",
+        );
+
+      expect(result).not.toBeNull();
+
+      expect(
+        result!.entity.name,
+      ).toBe("CodePilot");
+
+      expect(
+        result!.entity.type,
+      ).toBe("project");
+    } finally {
+      globalThis.fetch =
+        originalFetch;
+    }
+  },
+);
