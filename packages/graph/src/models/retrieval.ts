@@ -6,5 +6,6 @@ export interface GraphRetrievalResult {
   relationships: Array<{
     relationship: Relationship;
     entity: Entity;
+    depth: number;
   }>;
 }

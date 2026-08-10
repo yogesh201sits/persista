@@ -115,4 +115,54 @@ describe("Neo4jGraphRetrieval", () => {
       result!.relationships[0].entity.name,
     ).toBe("GraphTestBun");
   });
+  it("should retrieve multiple graph hops from Neo4j", async () => {
+  const persistaId =
+    crypto.randomUUID();
+
+  await graphStore.upsertEntity({
+    id: persistaId,
+    name: "GraphTestPersista",
+    type: "Project",
+    metadata: {},
+  });
+
+  await graphStore.upsertRelationship({
+    id: crypto.randomUUID(),
+    sourceId: yogeshId,
+    targetId: persistaId,
+    type: "Building",
+    confidence: 1,
+  });
+
+  const result =
+    await retrievalEngine.search(
+      "GraphTestYogesh",
+      2,
+    );
+
+  expect(result).not.toBeNull();
+
+  expect(
+    result!.relationships.length,
+  ).toBe(2);
+
+  const persistaResult =
+    result!.relationships.find(
+      (item) =>
+        item.entity.name ===
+        "GraphTestPersista",
+    );
+
+  expect(
+    persistaResult,
+  ).not.toBeUndefined();
+
+  expect(
+    persistaResult!.depth,
+  ).toBe(1);
+
+  await graphStore.deleteEntity(
+    persistaId,
+  );
+});
 });
