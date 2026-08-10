@@ -3,9 +3,9 @@ import type {
 } from "@persista/shared";
 
 import type {
-  VectorSearchOptions,
-  VectorSearchResult,VectorMemory
-} from "@persista/vector-store";
+  HybridSearchOptions,
+  HybridSearchResult,
+} from "@persista/ranking";
 
 import { MemoryUpdate } from "../models";
 
@@ -16,14 +16,14 @@ export interface MemoryManager {
 
   search(
     query: string,
-    options?: VectorSearchOptions,
-  ): Promise<VectorSearchResult[]>;
+    options?: HybridSearchOptions,
+  ): Promise<HybridSearchResult>;
 
   delete(
     id: string,
   ): Promise<void>;
 
   update(
-    memory:  MemoryUpdate,
+    memory: MemoryUpdate,
   ): Promise<void>;
 }

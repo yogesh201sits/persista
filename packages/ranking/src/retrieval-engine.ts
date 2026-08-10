@@ -3,9 +3,10 @@ import type {
   VectorSearchResult,
 } from "@persista/vector-store";
 
-export interface RetrievalEngine {
-  search(
-    query: string,
-    options?: VectorSearchOptions,
-  ): Promise<VectorSearchResult[]>;
-}
+import type { BaseRetrievalEngine } from "./base-retrieval-engine";
+
+export interface RetrievalEngine
+  extends BaseRetrievalEngine<
+    VectorSearchOptions,
+    VectorSearchResult[]
+  > {}

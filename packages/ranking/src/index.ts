@@ -6,3 +6,4 @@ export * from "./hybrid-retrieval-engine";
 export * from "./models";
 export * from "./default-hybrid-retrieval-engine";
 export * from "./scoring";
+export * from "./llm";
