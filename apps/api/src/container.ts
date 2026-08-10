@@ -7,19 +7,30 @@ import {
 
 import {
   DefaultMemoryDeduplicator,
+  DefaultMemoryManager,
 } from "@persista/core";
 
 import { HuggingFaceProvider } from "@persista/embeddings";
 
 import { QdrantVectorStore } from "@persista/vector-store";
 
-import { DefaultMemoryManager } from "@persista/core";
-
 import {
   DefaultRankingStrategy,
   DefaultRetrievalEngine,
 } from "@persista/ranking";
 
+import {
+  DefaultEntityResolver,
+  GraphMemoryManager,
+  LangChainGraphExtractor,
+  Neo4jGraphStore,
+  DefaultGraphRetrievalEngine
+} from "@persista/graph";
+
+
+// ─────────────────────────────────────
+// LLM
+// ─────────────────────────────────────
 
 if (!config.groqApiKey) {
   throw new Error(
@@ -34,12 +45,20 @@ const llmProvider =
   });
 
 
+// ─────────────────────────────────────
+// Memory Extractor
+// ─────────────────────────────────────
+
 const extractor =
   ExtractorFactory.create({
     type: "llm",
     llmProvider,
   });
 
+
+// ─────────────────────────────────────
+// Embeddings
+// ─────────────────────────────────────
 
 if (!config.hfToken) {
   throw new Error(
@@ -56,6 +75,10 @@ const embeddingProvider =
   });
 
 
+// ─────────────────────────────────────
+// Vector Store
+// ─────────────────────────────────────
+
 if (!config.qdrantUrl) {
   throw new Error(
     "QDRANT_URL is not configured",
@@ -71,13 +94,27 @@ const vectorStore =
   });
 
 
+// ─────────────────────────────────────
+// Ranking
+// ─────────────────────────────────────
+
 const rankingStrategy =
   new DefaultRankingStrategy();
+
+
+// ─────────────────────────────────────
+// Deduplication
+// ─────────────────────────────────────
 
 const deduplicator =
   new DefaultMemoryDeduplicator({
     threshold: 0.95,
   });
+
+
+// ─────────────────────────────────────
+// Retrieval
+// ─────────────────────────────────────
 
 const retrievalEngine =
   new DefaultRetrievalEngine(
@@ -87,11 +124,76 @@ const retrievalEngine =
   );
 
 
+// ─────────────────────────────────────
+// Vector Memory Manager
+// ─────────────────────────────────────
+
 export const memoryManager =
   new DefaultMemoryManager(
     extractor,
     embeddingProvider,
     vectorStore,
     retrievalEngine,
-    deduplicator
+    deduplicator,
+  );
+
+
+// ─────────────────────────────────────
+// Graph Store
+// ─────────────────────────────────────
+
+if (
+  !config.neo4jUri ||
+  !config.neo4jUsername ||
+  !config.neo4jPassword
+) {
+  throw new Error(
+    "Neo4j configuration is not configured",
+  );
+}
+
+const graphStore =
+  new Neo4jGraphStore({
+    uri: config.neo4jUri,
+    username: config.neo4jUsername,
+    password: config.neo4jPassword,
+});
+
+await graphStore.connect();
+
+
+// ─────────────────────────────────────
+// Graph Extractor
+// ─────────────────────────────────────
+
+const graphExtractor =
+  new LangChainGraphExtractor(
+    config.groqApiKey
+);
+
+
+// ─────────────────────────────────────
+// Entity Resolver
+// ─────────────────────────────────────
+
+const entityResolver =
+  new DefaultEntityResolver(
+    graphStore,
+);
+
+
+// ─────────────────────────────────────
+// Graph Memory Manager
+// ─────────────────────────────────────
+
+export const graphMemory =
+  new GraphMemoryManager(
+    graphExtractor,
+    entityResolver,
+    graphStore,
+  );
+
+export const graphRetrievalEngine =
+  new DefaultGraphRetrievalEngine(
+    graphStore,
   );

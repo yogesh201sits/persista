@@ -21,3 +21,14 @@ export const memorySearchRequestSchema =
       .record(z.string(), z.unknown())
       .optional(),
   });
+
+export const graphSearchRequestSchema =
+  z.object({
+    entity: z.string().min(1),
+    depth: z
+      .number()
+      .int()
+      .min(1)
+      .max(5)
+      .optional(),
+  });

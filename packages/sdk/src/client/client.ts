@@ -7,6 +7,10 @@ import type {
 import type { PersistaClientOptions } from "../config";
 import { PersistaSDKError } from "../errors";
 
+import type {
+  GraphSearchResult,
+} from "@persista/graph";
+
 export interface SearchOptions {
   limit?: number;
   minScore?: number;
@@ -24,6 +28,10 @@ export interface UpdateMemoryInput {
     | "relationship";
   confidence: number;
   value?: string;
+}
+
+export interface GraphSearchOptions {
+  depth?: number;
 }
 
 export class PersistaClient {
@@ -172,5 +180,26 @@ export class PersistaClient {
         method: "DELETE",
       },
     );
+  }
+  async graphSearch(
+    entity: string,
+    options?: GraphSearchOptions,
+  ): Promise<GraphSearchResult | null> {
+    const response =
+      await this.request<{
+        success: boolean;
+        result: GraphSearchResult | null;
+      }>(
+        "/memories/graph/search",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            entity,
+            depth: options?.depth,
+          }),
+        },
+      );
+
+    return response.result;
   }
 }
