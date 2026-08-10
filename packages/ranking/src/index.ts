@@ -4,3 +4,4 @@ export * from "./ranking-strategy";
 export * from "./default-ranking-strategy";
 export * from "./hybrid-retrieval-engine";
 export * from "./models";
+export * from "./default-hybrid-retrieval-engine";
