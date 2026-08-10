@@ -24,6 +24,7 @@ import {
   GraphMemoryManager,
   LangChainGraphExtractor,
   Neo4jGraphStore,
+  DefaultGraphRetrievalEngine
 } from "@persista/graph";
 
 
@@ -189,5 +190,10 @@ export const graphMemory =
   new GraphMemoryManager(
     graphExtractor,
     entityResolver,
+    graphStore,
+  );
+
+export const graphRetrievalEngine =
+  new DefaultGraphRetrievalEngine(
     graphStore,
   );
