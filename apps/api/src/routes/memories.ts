@@ -1,29 +1,37 @@
 import { Hono } from "hono";
 
-import { memoryManager } from "../container";
+import {graphMemory,memoryManager,} from "../container";
+
 import { validateBody } from "../middleware";
-import { rememberRequestSchema } from "../validators";
-import {updateMemoryRequestSchema} from '../validators'
+
+import {rememberRequestSchema,updateMemoryRequestSchema,} from "../validators";
 
 const memories = new Hono();
 
 memories.post(
   "/",
-  validateBody(rememberRequestSchema),
+  validateBody(
+    rememberRequestSchema,
+  ),
   async (c) => {
-    const body = c.get("body") as {
-      conversation: {
-        messages: {
-          role:
-            | "system"
-            | "user"
-            | "assistant";
-          content: string;
-        }[];
+    const body =
+      c.get("body") as {
+        conversation: {
+          messages: {
+            role:
+              | "system"
+              | "user"
+              | "assistant";
+            content: string;
+          }[];
+        };
       };
-    };
 
     await memoryManager.remember(
+      body.conversation,
+    );
+
+    await graphMemory.remember(
       body.conversation,
     );
 
