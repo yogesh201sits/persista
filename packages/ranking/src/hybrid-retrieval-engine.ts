@@ -1,4 +1,7 @@
-import { HybridSearchOptions,HybridSearchResult } from "./models/hybrid";
+import type {
+  HybridSearchOptions,
+  HybridSearchResult,
+} from "./models";
 
 export interface HybridRetrievalEngine {
   search(
