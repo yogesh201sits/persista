@@ -8,6 +8,10 @@ import {
   calculateGraphRelevance,
 } from "../src";
 
+import {
+  calculateMatchRelevance,
+} from "../src";
+
 describe(
   "calculateGraphRelevance",
   () => {
@@ -96,5 +100,41 @@ describe(
         expect(score).toBe(0.5);
       },
     );
+  it(
+    "should aggregate multiple graph matches",
+    () => {
+      const score =
+        calculateMatchRelevance([
+          {
+            entityId: "react",
+            depth: 1,
+            confidence: 1,
+          },
+          {
+            entityId: "hono",
+            depth: 1,
+            confidence: 1,
+          },
+        ]);
+
+      expect(score).toBe(1);
+    },
+  );
+
+  it(
+    "should reduce relevance for deeper matches",
+    () => {
+      const score =
+        calculateMatchRelevance([
+          {
+            entityId: "react",
+            depth: 2,
+            confidence: 1,
+          },
+        ]);
+
+      expect(score).toBe(0.5);
+    },
+  );
   },
 );

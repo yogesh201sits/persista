@@ -3,6 +3,12 @@ import type {
   HybridSearchResult,
 } from "./models";
 
+import {
+  calculateHybridScore,
+  calculateMatchRelevance,
+  findGraphMatches,
+} from "./scoring";
+
 export interface HybridRetrievalEngine {
   search(
     query: string,

@@ -14,65 +14,86 @@ describe(
   "DefaultHybridRetrievalEngine",
   () => {
     it(
-      "should retrieve from vector and graph",
-      async () => {
-        const vectorResults: VectorSearchResult[] = [
-            {
-                id: "memory-1",
-                score: 0.9,
-                metadata: {
-                content: "CodePilot uses React",
-                type: "fact",
-                confidence: 1,
-                createdAt: "2026-08-10T00:00:00.000Z",
-                },
-            },
-            ];
+  "should use related graph entities for hybrid scoring",
+  async () => {
+    const vectorResults: VectorSearchResult[] = [
+      {
+        id: "memory-react",
+        score: 0.8,
+        metadata: {
+          content:
+            "I prefer React for frontend development",
+          type: "preference",
+          confidence: 1,
+          createdAt:
+            "2026-08-10T00:00:00.000Z",
+        },
+      },
+    ];
 
-            const vectorEngine = {
-            search: async (): Promise<VectorSearchResult[]> => {
-                return vectorResults;
-            },
-        };
-        const graphEngine = {
-          search: async () => ({
-            entity: {
-              id: "entity-1",
-              name: "CodePilot",
-              type: "project",
+    const vectorEngine = {
+      search: async (
+        _query: string,
+      ): Promise<VectorSearchResult[]> => {
+        return vectorResults;
+      },
+    };
+
+    const graphEngine = {
+      search: async () => ({
+        entity: {
+          id: "codepilot",
+          name: "CodePilot",
+          type: "project",
+          metadata: {},
+        },
+
+        relationships: [
+          {
+            relationship: {
+              id: "relationship-react",
+              sourceId: "codepilot",
+              targetId: "react",
+              type: "uses",
+              confidence: 1,
               metadata: {},
             },
 
-            relationships: [],
-          }),
-        };
+            entity: {
+              id: "react",
+              name: "React",
+              type: "technology",
+              metadata: {},
+            },
 
-        const engine =
-          new DefaultHybridRetrievalEngine(
-            vectorEngine,
-            graphEngine,
-          );
+            depth: 1,
+          },
+        ],
+      }),
+    };
 
-        const result =
-          await engine.search(
-            "CodePilot",
-          );
+    const engine =
+      new DefaultHybridRetrievalEngine(
+        vectorEngine,
+        graphEngine,
+      );
 
-        expect(result.query)
-          .toBe("CodePilot");
+    const result =
+      await engine.search(
+        "What frontend technology?",
+      );
 
-        expect(
-          result.results.length,
-        ).toBe(2);
+    expect(
+      result.results[0].sources,
+    ).toEqual([
+      "vector",
+      "graph",
+    ]);
 
-        expect(
-          result.results[0].sources,
-        ).toEqual(["vector"]);
-
-        expect(
-          result.results[1].sources,
-        ).toEqual(["graph"]);
-      },
-    );
+    expect(
+      result.results[0].score,
+    ).toBeGreaterThan(0.8);
+  },
+);
   },
 );
