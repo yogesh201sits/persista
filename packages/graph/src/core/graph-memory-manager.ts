@@ -1,12 +1,15 @@
 import type { Conversation } from "@persista/shared";
 
 import type {
-  GraphExtractor,
   EntityResolver,
+  GraphExtractor,
+  GraphMemory,
   GraphStore,
 } from "../interfaces";
 
-export class GraphMemoryManager {
+export class GraphMemoryManager
+  implements GraphMemory
+{
   constructor(
     private readonly extractor: GraphExtractor,
     private readonly entityResolver: EntityResolver,
@@ -38,44 +41,42 @@ export class GraphMemoryManager {
       );
     }
 
-  for (
-  const extraction of result.relationships
-) {
-  const sourceId =
-    entityIds.get(
-      extraction.source.toLowerCase(),
-    );
+    for (
+      const extraction of result.relationships
+    ) {
+      const sourceId =
+        entityIds.get(
+          extraction.source.toLowerCase(),
+        );
 
-  const targetId =
-    entityIds.get(
-      extraction.target.toLowerCase(),
-    );
+      const targetId =
+        entityIds.get(
+          extraction.target.toLowerCase(),
+        );
 
-  if (!sourceId || !targetId) {
-    continue;
-  }
+      if (!sourceId || !targetId) {
+        continue;
+      }
 
-  const existing =
-    await this.graphStore.findRelationship(
-      sourceId,
-      targetId,
-      extraction.type,
-    );
+      const existing =
+        await this.graphStore.findRelationship(
+          sourceId,
+          targetId,
+          extraction.type,
+        );
 
-  if (existing) {
-    continue;
-  }
+      if (existing) {
+        continue;
+      }
 
-  await this.graphStore.upsertRelationship(
-    {
-      id: crypto.randomUUID(),
-      sourceId,
-      targetId,
-      type: extraction.type,
-      confidence:
-        extraction.confidence,
-    },
-  );
-}
+      await this.graphStore.upsertRelationship({
+        id: crypto.randomUUID(),
+        sourceId,
+        targetId,
+        type: extraction.type,
+        confidence:
+          extraction.confidence,
+      });
+    }
   }
 }
