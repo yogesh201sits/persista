@@ -8,11 +8,17 @@ const queryAnalysisSchema =
     ),
   });
 
+export interface QueryAnalyzerInterface {
+  analyze(
+    query: string,
+  ): Promise<QueryAnalysis>;
+}
+
 export interface QueryAnalysis {
   entities: string[];
 }
 
-export class QueryAnalyzer {
+export class QueryAnalyzer implements QueryAnalyzerInterface {
   private readonly llm;
 
   constructor(

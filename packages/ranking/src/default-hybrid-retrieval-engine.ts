@@ -11,6 +11,10 @@ import type {
 import { calculateRRFScore } from "./scoring";
 import { QueryAnalyzer } from "./llm";
 
+import type {
+  QueryAnalyzerInterface,
+} from "./llm";
+
 export class DefaultHybridRetrievalEngine
   implements HybridRetrievalEngine
 {
@@ -27,7 +31,7 @@ export class DefaultHybridRetrievalEngine
 
     private readonly graphRetrievalEngine: GraphRetrievalEngine,
 
-    private readonly queryAnalyzer: QueryAnalyzer,
+    private readonly queryAnalyzer: QueryAnalyzerInterface,
   ) {}
 
   async search(
