@@ -30,7 +30,6 @@ For architecture, retrieval internals, API reference, package structure, and tec
 
  > **Persistent memory infrastructure for AI agents.**
 
-
 ---
 
 ## Why Persista?
