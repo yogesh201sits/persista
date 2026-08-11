@@ -596,6 +596,7 @@ Query
 Entities
 ```
 
+
 The LLM is not used as a retrieval router.
 
 Persista's retrieval strategy remains hybrid retrieval.
