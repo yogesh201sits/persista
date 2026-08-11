@@ -6,9 +6,6 @@
 
 <br/>
 
- > **Persistent memory infrastructure for AI agents.**
-
-<br/>
  
 [![Status](https://img.shields.io/badge/status-active--development-yellow)](#status)
 [![Runtime](https://img.shields.io/badge/runtime-Bun-000000?logo=bun)](https://bun.sh/)
@@ -30,6 +27,9 @@ Persista is a modular, provider-agnostic memory infrastructure for AI applicatio
 Instead of building memory extraction, embeddings, vector storage, graph storage, and retrieval independently for every AI application, Persista provides them as reusable infrastructure.
 
 For architecture, retrieval internals, API reference, package structure, and technical implementation details, see [**TECHNICAL.md**](docs/TECHNICAL.md).
+
+ > **Persistent memory infrastructure for AI agents.**
+
 
 ---
 
