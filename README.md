@@ -1,27 +1,25 @@
 <div align="center">
 
-<img src="./assets/logo.png" alt="Persista logo" width="120" />
+<img width="500" height="270" alt="persistalogo" src="https://github.com/user-attachments/assets/00d321be-b366-4f03-9878-4f6e359229d3" />
 
 # Persista
- 
-> **Persistent memory infrastructure for AI agents.**
+
+<br/>
+
+ > **Persistent memory infrastructure for AI agents.**
+
+<br/>
  
 [![Status](https://img.shields.io/badge/status-active--development-yellow)](#status)
 [![Runtime](https://img.shields.io/badge/runtime-Bun-000000?logo=bun)](https://bun.sh/)
 [![Language](https://img.shields.io/badge/language-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vector Store](https://img.shields.io/badge/vector--store-Qdrant-DC244C)](https://qdrant.tech/)
 [![Graph Store](https://img.shields.io/badge/graph--store-Neo4j-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/)
-[![Database](https://img.shields.io/badge/database-PostgreSQL%20%2F%20Neon-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
 [![ORM](https://img.shields.io/badge/ORM-Prisma-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![LLM](https://img.shields.io/badge/LLM-Groq-F55036)](https://groq.com/)
 [![LLM Framework](https://img.shields.io/badge/framework-LangChain-1C3C3C)](https://www.langchain.com/)
-[![Embeddings](https://img.shields.io/badge/embeddings-Hugging%20Face-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/)
 [![API](https://img.shields.io/badge/API-Hono-E36002)](https://hono.dev/)
 [![Monorepo](https://img.shields.io/badge/monorepo-Bun%20Workspaces-000000?logo=bun)](#architecture)
 [![Runtime](https://img.shields.io/badge/runtime-Bun-000000?logo=bun)](https://bun.sh/)
-[![Ranking](https://img.shields.io/badge/ranking-RRF-9146FF)](#hybrid-retrieval)
-[![Retrieval](https://img.shields.io/badge/retrieval-hybrid-8A2BE2)](#hybrid-retrieval)
-[![Tests](https://img.shields.io/badge/tests-bun%20test-000000?logo=bun)](#testing)
 [![Architecture](https://img.shields.io/badge/architecture-provider--agnostic-informational)](#provider-architecture)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](#contributing)
 
@@ -112,7 +110,7 @@ At a high level, Persista turns conversations into persistent memories and makes
 
 ### Requirements
 
-* [Bun](https://bun.sh/)
+* Bun
 * PostgreSQL / Neon
 * Qdrant
 * Neo4j
