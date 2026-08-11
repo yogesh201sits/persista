@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="800" height="500" alt="persis" src="https://github.com/user-attachments/assets/13927c51-0a83-4b75-a3b9-703004471303" />
+<img width="216" height="410" alt="persis (1)" src="https://github.com/user-attachments/assets/267fb8ae-97d0-4517-b925-f4d14b2e3696" />
 
 # Persista
 
