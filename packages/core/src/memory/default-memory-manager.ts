@@ -14,9 +14,11 @@ import type {
   MemoryDeduplicator,
 } from "../deduplication/memory-deduplicator";
 
+import { HybridSearchOptions,HybridSearchResult } from "@persista/ranking";
+
 import type { Extractor } from "@persista/extractor";
 import type {
-  RetrievalEngine,
+  RetrievalEngine,HybridRetrievalEngine
 } from "@persista/ranking";
 
 import { MemoryUpdate } from "../models";
@@ -30,7 +32,7 @@ export class DefaultMemoryManager
     private readonly extractor: Extractor,
     private readonly embeddingProvider: EmbeddingProvider,
     private readonly vectorStore: VectorStore,
-    private readonly retrievalEngine: RetrievalEngine,
+    private readonly retrievalEngine: HybridRetrievalEngine,
     private readonly deduplicator: MemoryDeduplicator,
   ) {}
 
@@ -130,13 +132,13 @@ export class DefaultMemoryManager
   }
 
   async search(
-    query: string,
-    options?: VectorSearchOptions,
-  ): Promise<VectorSearchResult[]> {
-    return this.retrievalEngine.search(
-      query,
-      options,
-    );
+      query: string,
+      options?: HybridSearchOptions,
+    ): Promise<HybridSearchResult> {
+      return this.retrievalEngine.search(
+        query,
+        options,
+      );
   }
 
   async delete(

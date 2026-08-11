@@ -2,3 +2,8 @@ export * from "./default-retrieval-engine";
 export * from "./retrieval-engine";
 export * from "./ranking-strategy";
 export * from "./default-ranking-strategy";
+export * from "./hybrid-retrieval-engine";
+export * from "./models";
+export * from "./default-hybrid-retrieval-engine";
+export * from "./scoring";
+export * from "./llm";
