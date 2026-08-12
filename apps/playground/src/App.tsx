@@ -7,6 +7,8 @@ import {
   Settings,
 } from "lucide-react";
 
+import { ConversationPanel } from "./components/ConversationPanel";
+
 const navigation = [
   {
     label: "Overview",
@@ -33,6 +35,7 @@ function App() {
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <aside className="flex w-64 shrink-0 flex-col border-r border-white/10 bg-[#0d0d0f]">
+          {/* Logo */}
           <div className="border-b border-white/10 px-6 py-5">
             <div className="text-lg font-semibold tracking-tight">
               Persista
@@ -43,6 +46,7 @@ function App() {
             </div>
           </div>
 
+          {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -57,7 +61,10 @@ function App() {
                       : "text-white/50 hover:bg-white/5 hover:text-white"
                   }`}
                 >
-                  <Icon size={17} strokeWidth={1.8} />
+                  <Icon
+                    size={17}
+                    strokeWidth={1.8}
+                  />
 
                   <span>{item.label}</span>
 
@@ -71,12 +78,17 @@ function App() {
             })}
           </nav>
 
+          {/* Settings */}
           <div className="border-t border-white/10 p-4">
             <button
               type="button"
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/50 transition hover:bg-white/5 hover:text-white"
             >
-              <Settings size={17} strokeWidth={1.8} />
+              <Settings
+                size={17}
+                strokeWidth={1.8}
+              />
+
               <span>Settings</span>
             </button>
           </div>
@@ -85,10 +97,12 @@ function App() {
         {/* Main */}
         <main className="min-w-0 flex-1">
           <div className="mx-auto max-w-7xl px-8 py-10">
+            {/* Header */}
             <div className="mb-10">
               <div className="mb-2 flex items-center gap-2 text-sm text-white/40">
                 <Database size={15} />
-                Playground
+
+                <span>Playground</span>
               </div>
 
               <h1 className="text-3xl font-semibold tracking-tight">
@@ -96,8 +110,9 @@ function App() {
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
-                Explore how Persista stores, retrieves, and manages
-                persistent memory for your AI applications.
+                Explore how Persista stores, retrieves, and
+                manages persistent memory for your AI
+                applications.
               </p>
             </div>
 
@@ -121,28 +136,10 @@ function App() {
 
             {/* Workspace */}
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
-              <Panel
-                title="Remember"
-                description="Add a conversation and let Persista extract what matters."
-              >
-                <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                  <div className="text-xs text-white/30">
-                    Conversation
-                  </div>
+              {/* Real Conversation Panel */}
+              <ConversationPanel />
 
-                  <div className="mt-3 min-h-24 text-sm text-white/40">
-                    Conversation input will appear here.
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-4 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-white/90"
-                >
-                  Remember
-                </button>
-              </Panel>
-
+              {/* Search Panel */}
               <Panel
                 title="Search memories"
                 description="Retrieve relevant memories using semantic search."
@@ -183,7 +180,8 @@ function App() {
                 </div>
 
                 <div className="mt-1 text-xs text-white/25">
-                  Add a conversation to create your first memory.
+                  Add a conversation to create your first
+                  memory.
                 </div>
               </div>
             </Panel>
