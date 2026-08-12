@@ -19,6 +19,8 @@ import {
   DefaultRetrievalEngine,
 } from "@persista/ranking";
 
+import { QueryAnalyzer } from "@persista/ranking";
+
 import {
   DefaultEntityResolver,
   GraphMemoryManager,
@@ -162,8 +164,12 @@ export const graphMemory = new GraphMemoryManager(
 // Graph retrieval remains completely
 // independent from vector memory search.
 
+const queryAnalyzer = new QueryAnalyzer(
+  config.groqApiKey,
+);
+
 export const graphRetrievalEngine =
-  new DefaultGraphRetrievalEngine(graphStore);
+  new DefaultGraphRetrievalEngine(graphStore,queryAnalyzer);
 
 // ─────────────────────────────────────
 // Memory Manager
