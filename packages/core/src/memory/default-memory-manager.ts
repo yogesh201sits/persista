@@ -1,29 +1,26 @@
 import type { Conversation, EmbeddingProvider } from "@persista/shared";
 
 import type {
-  VectorStore,
   VectorMemory,
   VectorSearchOptions,
   VectorSearchResult,
+  VectorStore,
 } from "@persista/vector-store";
 
-import type { MemoryDeduplicator } from "../deduplication/memory-deduplicator";
-
-import { HybridSearchOptions, HybridSearchResult } from "@persista/ranking";
-
 import type { Extractor } from "@persista/extractor";
-import type { RetrievalEngine, HybridRetrievalEngine } from "@persista/ranking";
+import type { RetrievalEngine } from "@persista/ranking";
 
-import { MemoryUpdate } from "../models";
-
+import type { MemoryDeduplicator } from "../deduplication/memory-deduplicator";
 import type { MemoryManager } from "./memory-manager";
+
+import type { MemoryUpdate } from "../models";
 
 export class DefaultMemoryManager implements MemoryManager {
   constructor(
     private readonly extractor: Extractor,
     private readonly embeddingProvider: EmbeddingProvider,
     private readonly vectorStore: VectorStore,
-    private readonly retrievalEngine: HybridRetrievalEngine,
+    private readonly retrievalEngine: RetrievalEngine,
     private readonly deduplicator: MemoryDeduplicator,
   ) {}
 
@@ -51,9 +48,7 @@ export class DefaultMemoryManager implements MemoryManager {
 
     for (let i = 0; i < result.memories.length; i++) {
       const memory = result.memories[i];
-
       const embedding = embeddings[i];
-
       const duplicates = duplicateResults[i];
 
       if (this.deduplicator.isDuplicate(duplicates)) {
@@ -92,8 +87,8 @@ export class DefaultMemoryManager implements MemoryManager {
 
   async search(
     query: string,
-    options?: HybridSearchOptions,
-  ): Promise<HybridSearchResult> {
+    options?: VectorSearchOptions,
+  ): Promise<VectorSearchResult[]> {
     return this.retrievalEngine.search(query, options);
   }
 

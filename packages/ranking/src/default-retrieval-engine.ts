@@ -22,28 +22,27 @@ export class DefaultRetrievalEngine implements RetrievalEngine {
   ): Promise<VectorSearchResult[]> {
     const embedding = await this.embeddingProvider.embed(query);
 
-    const candidateLimit =
-      options?.limit !== undefined ? Math.max(options.limit * 3, 10) : 10;
+    const limit = options?.limit ?? 10;
+
+    const candidateLimit = Math.max(limit * 5, 20);
 
     const results = await this.vectorStore.search(embedding, {
       ...options,
       limit: candidateLimit,
     });
 
-    let filteredResults = results;
+    // Default minimum relevance threshold.
+    // Can be overridden through search options.
+    const minScore = options?.minScore ?? 0.3;
 
-    if (options?.minScore !== undefined) {
-      filteredResults = results.filter(
-        (result) => result.score >= options.minScore!,
-      );
-    }
+    const filteredResults = results.filter(
+      (result) => result.score >= minScore,
+    );
 
-    const rankedResults = this.rankingStrategy.rank(filteredResults);
+    const rankedResults = this.rankingStrategy.rank(
+      filteredResults,
+    );
 
-    if (options?.limit === undefined) {
-      return rankedResults;
-    }
-
-    return rankedResults.slice(0, options.limit);
+    return rankedResults.slice(0, limit);
   }
 }

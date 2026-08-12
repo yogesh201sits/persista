@@ -1,6 +1,9 @@
 import { config } from "@persista/config";
 
-import { ExtractorFactory, LangChainProvider } from "@persista/extractor";
+import {
+  ExtractorFactory,
+  LangChainProvider,
+} from "@persista/extractor";
 
 import {
   DefaultMemoryDeduplicator,
@@ -14,8 +17,6 @@ import { QdrantVectorStore } from "@persista/vector-store";
 import {
   DefaultRankingStrategy,
   DefaultRetrievalEngine,
-  DefaultHybridRetrievalEngine,
-  QueryAnalyzer,
 } from "@persista/ranking";
 
 import {
@@ -94,6 +95,11 @@ const deduplicator = new DefaultMemoryDeduplicator({
 // ─────────────────────────────────────
 // Vector Retrieval
 // ─────────────────────────────────────
+//
+// Vector retrieval is completely independent
+// from graph retrieval.
+//
+// MemoryManager uses this engine directly.
 
 const vectorRetrievalEngine = new DefaultRetrievalEngine(
   embeddingProvider,
@@ -105,8 +111,14 @@ const vectorRetrievalEngine = new DefaultRetrievalEngine(
 // Graph Store
 // ─────────────────────────────────────
 
-if (!config.neo4jUri || !config.neo4jUsername || !config.neo4jPassword) {
-  throw new Error("Neo4j configuration is not configured");
+if (
+  !config.neo4jUri ||
+  !config.neo4jUsername ||
+  !config.neo4jPassword
+) {
+  throw new Error(
+    "Neo4j configuration is not configured",
+  );
 }
 
 const graphStore = new Neo4jGraphStore({
@@ -121,13 +133,17 @@ await graphStore.connect();
 // Graph Extractor
 // ─────────────────────────────────────
 
-const graphExtractor = new LangChainGraphExtractor(config.groqApiKey);
+const graphExtractor = new LangChainGraphExtractor(
+  config.groqApiKey,
+);
 
 // ─────────────────────────────────────
 // Entity Resolver
 // ─────────────────────────────────────
 
-const entityResolver = new DefaultEntityResolver(graphStore);
+const entityResolver = new DefaultEntityResolver(
+  graphStore,
+);
 
 // ─────────────────────────────────────
 // Graph Memory Manager
@@ -142,33 +158,35 @@ export const graphMemory = new GraphMemoryManager(
 // ─────────────────────────────────────
 // Graph Retrieval
 // ─────────────────────────────────────
+//
+// Graph retrieval remains completely
+// independent from vector memory search.
 
-export const graphRetrievalEngine = new DefaultGraphRetrievalEngine(graphStore);
-
-// ─────────────────────────────────────
-// Query Analyzer
-// ─────────────────────────────────────
-
-const queryAnalyzer = new QueryAnalyzer(config.groqApiKey);
-
-// ─────────────────────────────────────
-// Hybrid Retrieval
-// ─────────────────────────────────────
-
-const hybridRetrievalEngine = new DefaultHybridRetrievalEngine(
-  vectorRetrievalEngine,
-  graphRetrievalEngine,
-  queryAnalyzer,
-);
+export const graphRetrievalEngine =
+  new DefaultGraphRetrievalEngine(graphStore);
 
 // ─────────────────────────────────────
 // Memory Manager
 // ─────────────────────────────────────
+//
+// IMPORTANT:
+// Use DefaultRetrievalEngine directly.
+// Do NOT use DefaultHybridRetrievalEngine.
+//
+// This means:
+//
+// MemoryManager.search()
+//        ↓
+// DefaultRetrievalEngine
+//        ↓
+// VectorStore
+//
+// Graph search is exposed separately.
 
 export const memoryManager = new DefaultMemoryManager(
   extractor,
   embeddingProvider,
   vectorStore,
-  hybridRetrievalEngine,
+  vectorRetrievalEngine,
   deduplicator,
 );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2} from "lucide-react";
 import { persista } from "../lib/persista";
 
 export function ConversationPanel() {
@@ -54,10 +54,6 @@ export function ConversationPanel() {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
       <div className="mb-5 flex items-start gap-3">
-        <div className="rounded-xl bg-violet-500/10 p-2 text-violet-400">
-          <Sparkles size={18} />
-        </div>
-
         <div>
           <h2 className="font-medium">
             Remember conversation
