@@ -10,8 +10,8 @@ routes.route("/health", health);
 
 routes.route("/memories", memories);
 
-routes.route("/memories/search",memoriesSearch);
+routes.route("/memories/search", memoriesSearch);
 
-routes.route("/memories/graph/search",graphSearch)
+routes.route("/memories/graph/search", graphSearch);
 
 export default routes;

@@ -11,25 +11,15 @@ export const updateSchema = z
     message: "At least one field must be provided.",
   });
 
-export const updateMemoryRequestSchema =
-  z.object({
-    id: z.string().min(1),
-    content: z.string().min(1),
+export const updateMemoryRequestSchema = z.object({
+  id: z.string().min(1),
+  content: z.string().min(1),
 
-    type: z.enum([
-      "fact",
-      "identity",
-      "preference",
-      "goal",
-      "relationship",
-    ]),
+  type: z.enum(["fact", "identity", "preference", "goal", "relationship"]),
 
-    confidence: z
-      .number()
-      .min(0)
-      .max(1),
+  confidence: z.number().min(0).max(1),
 
-    value: z.string().optional(),
-  });
+  value: z.string().optional(),
+});
 
 export type UpdateInput = z.infer<typeof updateSchema>;

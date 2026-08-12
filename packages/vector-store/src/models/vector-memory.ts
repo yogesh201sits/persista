@@ -10,7 +10,6 @@ export interface VectorMemoryMetadata {
   [key: string]: unknown;
 
   createdAt: string;
-
 }
 
 export interface VectorMemory {

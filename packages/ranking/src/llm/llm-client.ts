@@ -1,5 +1,3 @@
 export interface LLMClient {
-  generate(
-    prompt: string,
-  ): Promise<string>;
+  generate(prompt: string): Promise<string>;
 }

@@ -1,10 +1,5 @@
-import type {
-  Entity,
-  EntityExtraction,
-} from "../models";
+import type { Entity, EntityExtraction } from "../models";
 
 export interface EntityResolver {
-  resolve(
-    extraction: EntityExtraction,
-  ): Promise<Entity>;
+  resolve(extraction: EntityExtraction): Promise<Entity>;
 }

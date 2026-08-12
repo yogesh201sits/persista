@@ -1,31 +1,19 @@
-import type {
-  GraphRetrievalEngine,
-  GraphStore,
-} from "../interfaces";
+import type { GraphRetrievalEngine, GraphStore } from "../interfaces";
 
-import type {
-  GraphRetrievalResult,
-} from "../models";
+import type { GraphRetrievalResult } from "../models";
 
 import { Relationship } from "../models";
 
 import { Entity } from "../models";
 
-export class DefaultGraphRetrievalEngine
-  implements GraphRetrievalEngine
-{
-  constructor(
-    private readonly graphStore: GraphStore,
-  ) {}
+export class DefaultGraphRetrievalEngine implements GraphRetrievalEngine {
+  constructor(private readonly graphStore: GraphStore) {}
 
   async search(
     entityName: string,
     depth = 1,
   ): Promise<GraphRetrievalResult | null> {
-    const entity =
-      await this.graphStore.findEntity(
-        entityName,
-      );
+    const entity = await this.graphStore.findEntity(entityName);
 
     if (!entity) {
       return null;
@@ -41,44 +29,27 @@ export class DefaultGraphRetrievalEngine
 
     visited.add(entity.id);
 
-    let currentEntityIds =
-      new Set<string>([entity.id]);
+    let currentEntityIds = new Set<string>([entity.id]);
 
-    for (
-      let currentDepth = 1;
-      currentDepth <= depth;
-      currentDepth++
-    ) {
-      const nextEntityIds =
-        new Set<string>();
+    for (let currentDepth = 1; currentDepth <= depth; currentDepth++) {
+      const nextEntityIds = new Set<string>();
 
-      for (
-        const currentEntityId of currentEntityIds
-      ) {
+      for (const currentEntityId of currentEntityIds) {
         const currentRelationships =
-          await this.graphStore.getRelationships(
-            currentEntityId,
-          );
+          await this.graphStore.getRelationships(currentEntityId);
 
-        for (
-          const relationship of currentRelationships
-        ) {
+        for (const relationship of currentRelationships) {
           const relatedEntityId =
-            relationship.sourceId ===
-            currentEntityId
+            relationship.sourceId === currentEntityId
               ? relationship.targetId
               : relationship.sourceId;
 
-          if (
-            visited.has(relatedEntityId)
-          ) {
+          if (visited.has(relatedEntityId)) {
             continue;
           }
 
           const relatedEntity =
-            await this.graphStore.getEntity(
-              relatedEntityId,
-            );
+            await this.graphStore.getEntity(relatedEntityId);
 
           if (!relatedEntity) {
             continue;
@@ -86,9 +57,7 @@ export class DefaultGraphRetrievalEngine
 
           visited.add(relatedEntityId);
 
-          nextEntityIds.add(
-            relatedEntityId,
-          );
+          nextEntityIds.add(relatedEntityId);
 
           relationships.push({
             relationship,
@@ -98,8 +67,7 @@ export class DefaultGraphRetrievalEngine
         }
       }
 
-      currentEntityIds =
-        nextEntityIds;
+      currentEntityIds = nextEntityIds;
     }
 
     return {

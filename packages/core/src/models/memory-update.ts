@@ -1,6 +1,4 @@
-import type {
-  VectorMemoryMetadata,
-} from "@persista/vector-store";
+import type { VectorMemoryMetadata } from "@persista/vector-store";
 
 export interface MemoryUpdate {
   id: string;

@@ -1,11 +1,6 @@
-import neo4j, {
-  type Driver,
-} from "neo4j-driver";
+import neo4j, { type Driver } from "neo4j-driver";
 
-import type {
-  Entity,
-  Relationship,
-} from "../models";
+import type { Entity, Relationship } from "../models";
 
 import type { GraphStore } from "../interfaces";
 
@@ -16,38 +11,27 @@ export interface Neo4jGraphStoreOptions {
   database?: string;
 }
 
-export class Neo4jGraphStore
-  implements GraphStore
-{
+export class Neo4jGraphStore implements GraphStore {
   private readonly driver: Driver;
   private readonly database: string;
 
-  constructor(
-    options: Neo4jGraphStoreOptions,
-  ) {
+  constructor(options: Neo4jGraphStoreOptions) {
     this.driver = neo4j.driver(
       options.uri,
-      neo4j.auth.basic(
-        options.username,
-        options.password,
-      ),
+      neo4j.auth.basic(options.username, options.password),
     );
 
-    this.database =
-      options.database ?? "75ab4bc5";
+    this.database = options.database ?? "75ab4bc5";
   }
 
   async connect(): Promise<void> {
     await this.driver.verifyConnectivity();
   }
 
-  async upsertEntity(
-    entity: Entity,
-  ): Promise<void> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async upsertEntity(entity: Entity): Promise<void> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
       await session.run(
@@ -62,9 +46,7 @@ export class Neo4jGraphStore
           id: entity.id,
           name: entity.name,
           type: entity.type,
-          metadata: JSON.stringify(
-            entity.metadata ?? {},
-          ),
+          metadata: JSON.stringify(entity.metadata ?? {}),
         },
       );
     } finally {
@@ -72,13 +54,10 @@ export class Neo4jGraphStore
     }
   }
 
-  async upsertRelationship(
-    relationship: Relationship,
-  ): Promise<void> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async upsertRelationship(relationship: Relationship): Promise<void> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
       await session.run(
@@ -101,16 +80,11 @@ export class Neo4jGraphStore
         `,
         {
           id: relationship.id,
-          sourceId:
-            relationship.sourceId,
-          targetId:
-            relationship.targetId,
+          sourceId: relationship.sourceId,
+          targetId: relationship.targetId,
           type: relationship.type,
-          confidence:
-            relationship.confidence,
-          metadata: JSON.stringify(
-            relationship.metadata ?? {},
-          ),
+          confidence: relationship.confidence,
+          metadata: JSON.stringify(relationship.metadata ?? {}),
         },
       );
     } finally {
@@ -118,56 +92,45 @@ export class Neo4jGraphStore
     }
   }
 
-  async getEntity(
-    id: string,
-  ): Promise<Entity | null> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async getEntity(id: string): Promise<Entity | null> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
-      const result =
-        await session.run(
-          `
+      const result = await session.run(
+        `
           MATCH (e:Entity {id: $id})
           RETURN e
           `,
-          { id },
-        );
+        { id },
+      );
 
       if (result.records.length === 0) {
         return null;
       }
 
-      const node =
-        result.records[0].get("e");
+      const node = result.records[0].get("e");
 
       return {
         id: node.properties.id,
         name: node.properties.name,
         type: node.properties.type,
-        metadata: JSON.parse(
-          node.properties.metadata,
-        ),
+        metadata: JSON.parse(node.properties.metadata),
       };
     } finally {
       await session.close();
     }
   }
 
-  async getRelationships(
-    entityId: string,
-  ): Promise<Relationship[]> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async getRelationships(entityId: string): Promise<Relationship[]> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
-      const result =
-        await session.run(
-          `
+      const result = await session.run(
+        `
           MATCH (source:Entity)
                 -[r:RELATED_TO]->
                 (target:Entity)
@@ -181,50 +144,35 @@ export class Neo4jGraphStore
             source.id AS sourceId,
             target.id AS targetId
           `,
-          { entityId },
-        );
-
-      return result.records.map(
-        (record) => {
-          const relationship =
-            record.get("r");
-
-          return {
-            id:
-              relationship.properties.id,
-
-            sourceId:
-              record.get("sourceId"),
-
-            targetId:
-              record.get("targetId"),
-
-            type:
-              relationship.properties.type,
-
-            confidence:
-              relationship.properties
-                .confidence,
-
-            metadata: JSON.parse(
-              relationship.properties
-                .metadata,
-            ),
-          };
-        },
+        { entityId },
       );
+
+      return result.records.map((record) => {
+        const relationship = record.get("r");
+
+        return {
+          id: relationship.properties.id,
+
+          sourceId: record.get("sourceId"),
+
+          targetId: record.get("targetId"),
+
+          type: relationship.properties.type,
+
+          confidence: relationship.properties.confidence,
+
+          metadata: JSON.parse(relationship.properties.metadata),
+        };
+      });
     } finally {
       await session.close();
     }
   }
 
-  async deleteEntity(
-    id: string,
-  ): Promise<void> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async deleteEntity(id: string): Promise<void> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
       await session.run(
@@ -239,13 +187,10 @@ export class Neo4jGraphStore
     }
   }
 
-  async deleteRelationship(
-    id: string,
-  ): Promise<void> {
-    const session =
-      this.driver.session({
-        database: this.database,
-      });
+  async deleteRelationship(id: string): Promise<void> {
+    const session = this.driver.session({
+      database: this.database,
+    });
 
     try {
       await session.run(
@@ -264,18 +209,13 @@ export class Neo4jGraphStore
     await this.driver.close();
   }
 
-  async findEntity(
-  name: string,
-  type?: string,
-): Promise<Entity | null> {
-  const session =
-    this.driver.session({
+  async findEntity(name: string, type?: string): Promise<Entity | null> {
+    const session = this.driver.session({
       database: this.database,
     });
 
-  try {
-    const result =
-      await session.run(
+    try {
+      const result = await session.run(
         `
         MATCH (e:Entity)
         WHERE
@@ -293,39 +233,34 @@ export class Neo4jGraphStore
         },
       );
 
-    if (result.records.length === 0) {
-      return null;
+      if (result.records.length === 0) {
+        return null;
+      }
+
+      const node = result.records[0].get("e");
+
+      return {
+        id: node.properties.id,
+        name: node.properties.name,
+        type: node.properties.type,
+        metadata: JSON.parse(node.properties.metadata),
+      };
+    } finally {
+      await session.close();
     }
-
-    const node =
-      result.records[0].get("e");
-
-    return {
-      id: node.properties.id,
-      name: node.properties.name,
-      type: node.properties.type,
-      metadata: JSON.parse(
-        node.properties.metadata,
-),
-    };
-  } finally {
-    await session.close();
   }
-}
 
   async findRelationship(
-  sourceId: string,
-  targetId: string,
-  type: string,
-): Promise<Relationship | null> {
-  const session =
-    this.driver.session({
+    sourceId: string,
+    targetId: string,
+    type: string,
+  ): Promise<Relationship | null> {
+    const session = this.driver.session({
       database: this.database,
-  });
+    });
 
-  try {
-    const result =
-      await session.run(
+    try {
+      const result = await session.run(
         `
         MATCH (
           source:Entity
@@ -349,29 +284,24 @@ export class Neo4jGraphStore
         },
       );
 
-    if (result.records.length === 0) {
-      return null;
+      if (result.records.length === 0) {
+        return null;
+      }
+
+      const record = result.records[0];
+
+      const relationship = record.get("r");
+
+      return {
+        id: relationship.properties.id,
+        sourceId: record.get("sourceId"),
+        targetId: record.get("targetId"),
+        type: relationship.properties.type,
+        confidence: relationship.properties.confidence,
+        metadata: JSON.parse(relationship.properties.metadata),
+      };
+    } finally {
+      await session.close();
     }
-
-    const record =
-      result.records[0];
-
-    const relationship =
-      record.get("r");
-
-    return {
-      id: relationship.properties.id,
-      sourceId: record.get("sourceId"),
-      targetId: record.get("targetId"),
-      type: relationship.properties.type,
-      confidence:
-        relationship.properties.confidence,
-      metadata: JSON.parse(
-        relationship.properties.metadata,
-      ),
-    };
-  } finally {
-    await session.close();
   }
-}
 }

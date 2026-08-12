@@ -1,11 +1,7 @@
 import type { Conversation } from "@persista/shared";
 
-import type {
-  GraphExtractionResult,
-} from "../models";
+import type { GraphExtractionResult } from "../models";
 
 export interface GraphExtractor {
-  extract(
-    conversation: Conversation,
-  ): Promise<GraphExtractionResult>;
+  extract(conversation: Conversation): Promise<GraphExtractionResult>;
 }

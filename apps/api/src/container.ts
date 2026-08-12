@@ -1,9 +1,6 @@
 import { config } from "@persista/config";
 
-import {
-  ExtractorFactory,
-  LangChainProvider,
-} from "@persista/extractor";
+import { ExtractorFactory, LangChainProvider } from "@persista/extractor";
 
 import {
   DefaultMemoryDeduplicator,
@@ -108,11 +105,7 @@ const vectorRetrievalEngine = new DefaultRetrievalEngine(
 // Graph Store
 // ─────────────────────────────────────
 
-if (
-  !config.neo4jUri ||
-  !config.neo4jUsername ||
-  !config.neo4jPassword
-) {
+if (!config.neo4jUri || !config.neo4jUsername || !config.neo4jPassword) {
   throw new Error("Neo4j configuration is not configured");
 }
 
@@ -128,17 +121,13 @@ await graphStore.connect();
 // Graph Extractor
 // ─────────────────────────────────────
 
-const graphExtractor = new LangChainGraphExtractor(
-  config.groqApiKey,
-);
+const graphExtractor = new LangChainGraphExtractor(config.groqApiKey);
 
 // ─────────────────────────────────────
 // Entity Resolver
 // ─────────────────────────────────────
 
-const entityResolver = new DefaultEntityResolver(
-  graphStore,
-);
+const entityResolver = new DefaultEntityResolver(graphStore);
 
 // ─────────────────────────────────────
 // Graph Memory Manager
@@ -154,29 +143,23 @@ export const graphMemory = new GraphMemoryManager(
 // Graph Retrieval
 // ─────────────────────────────────────
 
-export const graphRetrievalEngine =
-  new DefaultGraphRetrievalEngine(
-    graphStore,
-  );
+export const graphRetrievalEngine = new DefaultGraphRetrievalEngine(graphStore);
 
 // ─────────────────────────────────────
 // Query Analyzer
 // ─────────────────────────────────────
 
-const queryAnalyzer = new QueryAnalyzer(
-  config.groqApiKey,
-);
+const queryAnalyzer = new QueryAnalyzer(config.groqApiKey);
 
 // ─────────────────────────────────────
 // Hybrid Retrieval
 // ─────────────────────────────────────
 
-const hybridRetrievalEngine =
-  new DefaultHybridRetrievalEngine(
-    vectorRetrievalEngine,
-    graphRetrievalEngine,
-    queryAnalyzer,
-  );
+const hybridRetrievalEngine = new DefaultHybridRetrievalEngine(
+  vectorRetrievalEngine,
+  graphRetrievalEngine,
+  queryAnalyzer,
+);
 
 // ─────────────────────────────────────
 // Memory Manager

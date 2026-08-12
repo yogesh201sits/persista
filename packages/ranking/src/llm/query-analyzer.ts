@@ -1,17 +1,12 @@
 import { ChatGroq } from "@langchain/groq";
 import { z } from "zod";
 
-const queryAnalysisSchema =
-  z.object({
-    entities: z.array(
-      z.string(),
-    ),
-  });
+const queryAnalysisSchema = z.object({
+  entities: z.array(z.string()),
+});
 
 export interface QueryAnalyzerInterface {
-  analyze(
-    query: string,
-  ): Promise<QueryAnalysis>;
+  analyze(query: string): Promise<QueryAnalysis>;
 }
 
 export interface QueryAnalysis {
@@ -21,10 +16,7 @@ export interface QueryAnalysis {
 export class QueryAnalyzer implements QueryAnalyzerInterface {
   private readonly llm;
 
-  constructor(
-    apiKey: string,
-    model = "llama-3.3-70b-versatile",
-  ) {
+  constructor(apiKey: string, model = "llama-3.3-70b-versatile") {
     this.llm = new ChatGroq({
       apiKey,
       model,
@@ -32,19 +24,13 @@ export class QueryAnalyzer implements QueryAnalyzerInterface {
     });
   }
 
-  async analyze(
-    query: string,
-  ): Promise<QueryAnalysis> {
-    const structuredLlm =
-      this.llm.withStructuredOutput(
-        queryAnalysisSchema,
-      );
+  async analyze(query: string): Promise<QueryAnalysis> {
+    const structuredLlm = this.llm.withStructuredOutput(queryAnalysisSchema);
 
-    const result =
-      await structuredLlm.invoke([
-        {
-          role: "system",
-          content: `
+    const result = await structuredLlm.invoke([
+      {
+        role: "system",
+        content: `
 You are a query analyzer for a
 hybrid memory retrieval system.
 
@@ -69,19 +55,15 @@ Rules:
 - Return an empty array when there
   are no graph entities.
           `,
-        },
-        {
-          role: "user",
-          content: query,
-        },
-      ]);
+      },
+      {
+        role: "user",
+        content: query,
+      },
+    ]);
 
     return {
-      entities:
-        result.entities.map(
-          (entity) =>
-            entity.trim(),
-        ),
+      entities: result.entities.map((entity) => entity.trim()),
     };
   }
 }

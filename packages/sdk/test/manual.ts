@@ -1,12 +1,8 @@
-import {
-  PersistaClient,
-} from "../src";
+import { PersistaClient } from "../src";
 
-const client =
-  new PersistaClient({
-    baseUrl:
-      "http://localhost:3000",
-  });
+const client = new PersistaClient({
+  baseUrl: "http://localhost:3000",
+});
 
 await client.remember({
   messages: [
@@ -18,30 +14,12 @@ await client.remember({
   ],
 });
 
-console.log(
-  "Memory created successfully.",
-);
+console.log("Memory created successfully.");
 
-const results =
-  await client.search(
-    "What technologies does CodePilot use?",
-  );
+const results = await client.search("What technologies does CodePilot use?");
 
-console.log(
-  "Vector search results:",
-  results,
-);
+console.log("Vector search results:", results);
 
-const graphResult =
-  await client.graphSearch(
-    "CodePilot",
-  );
+const graphResult = await client.graphSearch("CodePilot");
 
-console.log(
-  "Graph search result:",
-  JSON.stringify(
-    graphResult,
-    null,
-    2,
-  ),
-);
+console.log("Graph search result:", JSON.stringify(graphResult, null, 2));

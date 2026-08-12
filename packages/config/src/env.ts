@@ -11,7 +11,7 @@ export const config = {
   qdrantApiKey: process.env.QDRANT_API_KEY,
   neo4jUri: process.env.NEO4J_URI,
   neo4jUsername: process.env.NEO4J_USERNAME,
-  neo4jPassword:process.env.NEO4J_PASSWORD,
+  neo4jPassword: process.env.NEO4J_PASSWORD,
 };
 
 export const hfToken = {};

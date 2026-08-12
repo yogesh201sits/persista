@@ -12,11 +12,7 @@ export const rememberRequestSchema = z.object({
   conversation: z.object({
     messages: z.array(
       z.object({
-        role: z.enum([
-          "system",
-          "user",
-          "assistant",
-        ]),
+        role: z.enum(["system", "user", "assistant"]),
         content: z.string().min(1),
       }),
     ),

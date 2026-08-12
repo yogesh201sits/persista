@@ -11,13 +11,9 @@ import type {
 import { calculateRRFScore } from "./scoring";
 import { QueryAnalyzer } from "./llm";
 
-import type {
-  QueryAnalyzerInterface,
-} from "./llm";
+import type { QueryAnalyzerInterface } from "./llm";
 
-export class DefaultHybridRetrievalEngine
-  implements HybridRetrievalEngine
-{
+export class DefaultHybridRetrievalEngine implements HybridRetrievalEngine {
   constructor(
     private readonly vectorRetrievalEngine: {
       search(
@@ -38,11 +34,9 @@ export class DefaultHybridRetrievalEngine
     query: string,
     options?: HybridSearchOptions,
   ): Promise<HybridSearchResult> {
-    const limit =
-      options?.limit ?? 10;
+    const limit = options?.limit ?? 10;
 
-    const graphDepth =
-      options?.graphDepth ?? 1;
+    const graphDepth = options?.graphDepth ?? 1;
 
     /*
      * --------------------------------
@@ -50,10 +44,7 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const analysis =
-      await this.queryAnalyzer.analyze(
-        query,
-      );
+    const analysis = await this.queryAnalyzer.analyze(query);
 
     /*
      * --------------------------------
@@ -61,15 +52,10 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const vectorPromise =
-      this.vectorRetrievalEngine.search(
-        query,
-        {
-          limit,
-          minScore:
-            options?.minScore,
-        },
-      );
+    const vectorPromise = this.vectorRetrievalEngine.search(query, {
+      limit,
+      minScore: options?.minScore,
+    });
 
     /*
      * Graph search uses entities
@@ -80,16 +66,10 @@ export class DefaultHybridRetrievalEngine
 
     const graphPromise =
       analysis.entities.length > 0
-        ? this.graphRetrievalEngine.search(
-            analysis.entities[0],
-            graphDepth,
-          )
+        ? this.graphRetrievalEngine.search(analysis.entities[0], graphDepth)
         : Promise.resolve(null);
 
-    const [
-      vectorResults,
-      graphResult,
-    ] = await Promise.all([
+    const [vectorResults, graphResult] = await Promise.all([
       vectorPromise,
       graphPromise,
     ]);
@@ -100,21 +80,12 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const vectorRanks =
-      new Map<string, number>();
+    const vectorRanks = new Map<string, number>();
 
-    for (
-      let index = 0;
-      index < vectorResults.length;
-      index++
-    ) {
-      const result =
-        vectorResults[index];
+    for (let index = 0; index < vectorResults.length; index++) {
+      const result = vectorResults[index];
 
-      vectorRanks.set(
-        result.id,
-        index + 1,
-      );
+      vectorRanks.set(result.id, index + 1);
     }
 
     /*
@@ -123,28 +94,14 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const graphItems =
-      graphResult
-        ? this.getGraphItems(
-            graphResult,
-          )
-        : [];
+    const graphItems = graphResult ? this.getGraphItems(graphResult) : [];
 
-    const graphRanks =
-      new Map<string, number>();
+    const graphRanks = new Map<string, number>();
 
-    for (
-      let index = 0;
-      index < graphItems.length;
-      index++
-    ) {
-      const item =
-        graphItems[index];
+    for (let index = 0; index < graphItems.length; index++) {
+      const item = graphItems[index];
 
-      graphRanks.set(
-        item.id,
-        index + 1,
-      );
+      graphRanks.set(item.id, index + 1);
     }
 
     /*
@@ -153,8 +110,7 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const candidateIds =
-      new Set<string>();
+    const candidateIds = new Set<string>();
 
     for (const result of vectorResults) {
       candidateIds.add(result.id);
@@ -170,87 +126,61 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    const results: HybridSearchItem[] =
-      [];
+    const results: HybridSearchItem[] = [];
 
     for (const id of candidateIds) {
-      const vectorRank =
-        vectorRanks.get(id);
+      const vectorRank = vectorRanks.get(id);
 
-      const graphRank =
-        graphRanks.get(id);
+      const graphRank = graphRanks.get(id);
 
       const ranks: {
         id: string;
         rank: number;
       }[] = [];
 
-      if (
-        vectorRank !== undefined
-      ) {
+      if (vectorRank !== undefined) {
         ranks.push({
           id,
           rank: vectorRank,
         });
       }
 
-      if (
-        graphRank !== undefined
-      ) {
+      if (graphRank !== undefined) {
         ranks.push({
           id,
           rank: graphRank,
         });
       }
 
-      const score =
-        calculateRRFScore(
-          ranks,
-          {
-            k: 60,
-          },
-        );
+      const score = calculateRRFScore(ranks, {
+        k: 60,
+      });
 
-      const vectorResult =
-        vectorResults.find(
-          (item) =>
-            item.id === id,
-        );
+      const vectorResult = vectorResults.find((item) => item.id === id);
 
-      const graphItem =
-        graphItems.find(
-          (item) =>
-            item.id === id,
-        );
+      const graphItem = graphItems.find((item) => item.id === id);
 
       results.push({
         id,
         score,
 
         sources: [
-          ...(vectorRank !== undefined
-            ? ["vector" as const]
-            : []),
+          ...(vectorRank !== undefined ? ["vector" as const] : []),
 
-          ...(graphRank !== undefined
-            ? ["graph" as const]
-            : []),
+          ...(graphRank !== undefined ? ["graph" as const] : []),
         ],
 
         ...(vectorResult
           ? {
-              memory:
-                vectorResult,
+              memory: vectorResult,
             }
           : {}),
 
         ...(graphItem
           ? {
-              entity:
-                graphItem.entity,
+              entity: graphItem.entity,
 
-              relationships:
-                graphResult?.relationships,
+              relationships: graphResult?.relationships,
             }
           : {}),
       });
@@ -262,25 +192,17 @@ export class DefaultHybridRetrievalEngine
      * --------------------------------
      */
 
-    results.sort(
-      (a, b) =>
-        b.score - a.score,
-    );
+    results.sort((a, b) => b.score - a.score);
 
     return {
       query,
-      results:
-        results.slice(0, limit),
+      results: results.slice(0, limit),
     };
   }
 
   private getGraphItems(
     graphResult: NonNullable<
-      Awaited<
-        ReturnType<
-          GraphRetrievalEngine["search"]
-        >
-      >
+      Awaited<ReturnType<GraphRetrievalEngine["search"]>>
     >,
   ) {
     const items: {
@@ -290,11 +212,9 @@ export class DefaultHybridRetrievalEngine
       confidence: number;
     }[] = [
       {
-        id:
-          graphResult.entity.id,
+        id: graphResult.entity.id,
 
-        entity:
-          graphResult.entity,
+        entity: graphResult.entity,
 
         depth: 0,
 
@@ -302,23 +222,15 @@ export class DefaultHybridRetrievalEngine
       },
     ];
 
-    for (
-      const relationship
-      of graphResult.relationships
-    ) {
+    for (const relationship of graphResult.relationships) {
       items.push({
-        id:
-          relationship.entity.id,
+        id: relationship.entity.id,
 
-        entity:
-          relationship.entity,
+        entity: relationship.entity,
 
-        depth:
-          relationship.depth,
+        depth: relationship.depth,
 
-        confidence:
-          relationship.relationship
-            .confidence,
+        confidence: relationship.relationship.confidence,
       });
     }
 
@@ -341,15 +253,9 @@ export class DefaultHybridRetrievalEngine
      */
 
     items.sort((a, b) => {
-      const scoreA =
-        a.depth === 0
-          ? a.confidence
-          : a.confidence / a.depth;
+      const scoreA = a.depth === 0 ? a.confidence : a.confidence / a.depth;
 
-      const scoreB =
-        b.depth === 0
-          ? b.confidence
-          : b.confidence / b.depth;
+      const scoreB = b.depth === 0 ? b.confidence : b.confidence / b.depth;
 
       return scoreB - scoreA;
     });

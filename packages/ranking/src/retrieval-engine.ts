@@ -6,7 +6,4 @@ import type {
 import type { BaseRetrievalEngine } from "./base-retrieval-engine";
 
 export interface RetrievalEngine
-  extends BaseRetrievalEngine<
-    VectorSearchOptions,
-    VectorSearchResult[]
-  > {}
+  extends BaseRetrievalEngine<VectorSearchOptions, VectorSearchResult[]> {}

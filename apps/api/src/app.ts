@@ -9,7 +9,6 @@ app.onError(errorMiddleware);
 
 app.use("*", requestIdMiddleware);
 
-
 app.route("/", routes);
 
 export default app;

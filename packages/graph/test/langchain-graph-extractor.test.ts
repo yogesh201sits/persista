@@ -1,8 +1,4 @@
-import {
-  describe,
-  expect,
-  it,
-} from "bun:test";
+import { describe, expect, it } from "bun:test";
 
 import { LangChainGraphExtractor } from "../src";
 
@@ -10,19 +6,13 @@ import type { Conversation } from "@persista/shared";
 
 describe("LangChainGraphExtractor", () => {
   it("should extract entities and relationships", async () => {
-    const apiKey =
-      process.env.GROQ_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      throw new Error(
-        "GROQ_API_KEY is required",
-      );
+      throw new Error("GROQ_API_KEY is required");
     }
 
-    const extractor =
-      new LangChainGraphExtractor(
-        apiKey,
-      );
+    const extractor = new LangChainGraphExtractor(apiKey);
 
     const conversation: Conversation = {
       messages: [
@@ -34,24 +24,12 @@ describe("LangChainGraphExtractor", () => {
       ],
     };
 
-    const result =
-      await extractor.extract(
-        conversation,
-      );
+    const result = await extractor.extract(conversation);
 
-    console.log(
-      JSON.stringify(
-        result,
-        null,
-        2,
-      ),
-    );
+    console.log(JSON.stringify(result, null, 2));
 
-    expect(result.entities.length)
-      .toBeGreaterThan(0);
+    expect(result.entities.length).toBeGreaterThan(0);
 
-    expect(
-      result.relationships.length,
-    ).toBeGreaterThan(0);
+    expect(result.relationships.length).toBeGreaterThan(0);
   });
 });

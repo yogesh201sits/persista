@@ -4,7 +4,7 @@ import type { GraphSearchResult } from "@persista/graph";
 
 import { VectorSearchOptions } from "@persista/vector-store";
 
-export interface HybridSearchOptions extends VectorSearchOptions{
+export interface HybridSearchOptions extends VectorSearchOptions {
   limit?: number;
   minScore?: number;
   graphDepth?: number;

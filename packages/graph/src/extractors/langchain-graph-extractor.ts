@@ -1,45 +1,31 @@
-import {
-  ChatGroq,
-} from "@langchain/groq";
+import { ChatGroq } from "@langchain/groq";
 
-import {
-  ChatPromptTemplate,
-} from "@langchain/core/prompts";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 
 import type { Conversation } from "@persista/shared";
 
-import type {
-  GraphExtractor,
-} from "../interfaces";
+import type { GraphExtractor } from "../interfaces";
 
-import type {
-  GraphExtractionResult,
-} from "../models";
+import type { GraphExtractionResult } from "../models";
 
-import { graphExtractionSchema } from "../schema"
+import { graphExtractionSchema } from "../schema";
 
-export class LangChainGraphExtractor
-  implements GraphExtractor
-{
+export class LangChainGraphExtractor implements GraphExtractor {
   private readonly model;
 
   private readonly prompt;
 
-  constructor(
-    apiKey: string,
-  ) {
+  constructor(apiKey: string) {
     this.model = new ChatGroq({
       apiKey,
-      model:
-        "llama-3.3-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       temperature: 0,
     });
 
-    this.prompt =
-      ChatPromptTemplate.fromMessages([
-        [
-          "system",
-          `
+    this.prompt = ChatPromptTemplate.fromMessages([
+      [
+        "system",
+        `
 You are a graph memory extraction system.
 
 Extract meaningful entities and
@@ -66,32 +52,21 @@ Rules:
 - Confidence must be between 0 and 1.
 - Ignore irrelevant conversational text.
 `,
-        ],
-        [
-          "human",
-          "Conversation:\\n{conversation}",
-        ],
-      ]);
+      ],
+      ["human", "Conversation:\\n{conversation}"],
+    ]);
   }
 
-  async extract(
-    conversation: Conversation,
-  ): Promise<GraphExtractionResult> {
-    const structuredModel =
-      this.model.withStructuredOutput(
-        graphExtractionSchema,
-      );
+  async extract(conversation: Conversation): Promise<GraphExtractionResult> {
+    const structuredModel = this.model.withStructuredOutput(
+      graphExtractionSchema,
+    );
 
-    const chain =
-      this.prompt.pipe(
-        structuredModel,
-      );
+    const chain = this.prompt.pipe(structuredModel);
 
-    const result =
-      await chain.invoke({
-        conversation:
-          JSON.stringify(conversation),
-      });
+    const result = await chain.invoke({
+      conversation: JSON.stringify(conversation),
+    });
 
     return result;
   }

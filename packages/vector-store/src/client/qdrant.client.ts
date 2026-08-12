@@ -1,8 +1,6 @@
 import { QdrantClient as QdrantSdk } from "@qdrant/js-client-rest";
 
-import type {
-  VectorSearchFilter,
-} from "@persista/vector-store";
+import type { VectorSearchFilter } from "@persista/vector-store";
 
 export interface QdrantClientOptions {
   url: string;
@@ -78,29 +76,22 @@ export class QdrantClient {
     });
   }
 
-  async search1(
-    vector: number[],
-    limit = 10,
-    filter?: VectorSearchFilter[],
-  ) {
-    return await this.client.query(
-      this.options.collection,
-      {
-        query: vector,
-        limit,
-        with_payload: true,
-        filter: filter
-          ? {
-              must: filter.map((item) => ({
-                key: item.field,
-                match: {
-                  value: item.value,
-                },
-              })),
-            }
-          : undefined,
-      },
-    );
+  async search1(vector: number[], limit = 10, filter?: VectorSearchFilter[]) {
+    return await this.client.query(this.options.collection, {
+      query: vector,
+      limit,
+      with_payload: true,
+      filter: filter
+        ? {
+            must: filter.map((item) => ({
+              key: item.field,
+              match: {
+                value: item.value,
+              },
+            })),
+          }
+        : undefined,
+    });
   }
 
   async delete(id: string | number): Promise<void> {

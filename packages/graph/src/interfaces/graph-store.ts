@@ -13,10 +13,7 @@ export interface GraphStore {
 
   deleteRelationship(id: string): Promise<void>;
 
-  findEntity(
-    name: string,
-    type?: string,
-  ): Promise<Entity | null>;
+  findEntity(name: string, type?: string): Promise<Entity | null>;
 
   findRelationship(
     sourceId: string,

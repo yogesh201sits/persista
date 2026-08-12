@@ -1,6 +1,4 @@
-import type {
-  Conversation,
-} from "@persista/shared";
+import type { Conversation } from "@persista/shared";
 
 import type {
   HybridSearchOptions,
@@ -10,20 +8,14 @@ import type {
 import { MemoryUpdate } from "../models";
 
 export interface MemoryManager {
-  remember(
-    conversation: Conversation,
-  ): Promise<void>;
+  remember(conversation: Conversation): Promise<void>;
 
   search(
     query: string,
     options?: HybridSearchOptions,
   ): Promise<HybridSearchResult>;
 
-  delete(
-    id: string,
-  ): Promise<void>;
+  delete(id: string): Promise<void>;
 
-  update(
-    memory: MemoryUpdate,
-  ): Promise<void>;
+  update(memory: MemoryUpdate): Promise<void>;
 }

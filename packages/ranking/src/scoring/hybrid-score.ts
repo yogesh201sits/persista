@@ -8,26 +8,17 @@ export function calculateHybridScore(
   graphScore: number,
   options: HybridScoreOptions,
 ): number {
-  const totalWeight =
-    options.vectorWeight +
-    options.graphWeight;
+  const totalWeight = options.vectorWeight + options.graphWeight;
 
   if (totalWeight <= 0) {
-    throw new Error(
-      "Hybrid weights must be greater than zero.",
-    );
+    throw new Error("Hybrid weights must be greater than zero.");
   }
 
-  const normalizedVectorWeight =
-    options.vectorWeight / totalWeight;
+  const normalizedVectorWeight = options.vectorWeight / totalWeight;
 
-  const normalizedGraphWeight =
-    options.graphWeight / totalWeight;
+  const normalizedGraphWeight = options.graphWeight / totalWeight;
 
   return (
-    vectorScore *
-      normalizedVectorWeight +
-    graphScore *
-      normalizedGraphWeight
+    vectorScore * normalizedVectorWeight + graphScore * normalizedGraphWeight
   );
 }

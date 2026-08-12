@@ -38,13 +38,8 @@ describe("PersistaClient", () => {
 });
 const originalFetch = globalThis.fetch;
 
-globalThis.fetch = (async (
-  input: RequestInfo | URL,
-  init?: RequestInit,
-) => {
-  expect(input).toBe(
-    "http://localhost:3000/memories",
-  );
+globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+  expect(input).toBe("http://localhost:3000/memories");
 
   expect(init?.method).toBe("POST");
 
@@ -61,26 +56,18 @@ globalThis.fetch = (async (
     }),
   );
 
-  return new Response(
-    JSON.stringify({}),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+  return new Response(JSON.stringify({}), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
 }) as typeof fetch;
 
 test("sends a remember request", async () => {
   const fetchMock = mock(
-    async (
-      input: RequestInfo | URL,
-      init?: RequestInit,
-    ) => {
-      expect(input).toBe(
-        "http://localhost:3000/memories",
-      );
+    async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(input).toBe("http://localhost:3000/memories");
 
       expect(init?.method).toBe("POST");
 
@@ -97,17 +84,13 @@ test("sends a remember request", async () => {
         }),
       );
 
-      return new Response(
-        JSON.stringify({}),
-        {
-          status: 200,
-        },
-      );
+      return new Response(JSON.stringify({}), {
+        status: 200,
+      });
     },
   );
 
-  globalThis.fetch =
-    fetchMock as unknown as typeof fetch;
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
 
   try {
     const client = new PersistaClient({
@@ -163,9 +146,7 @@ test("throws PersistaSDKError for failed requests", async () => {
 
       const sdkError = error as PersistaSDKError;
 
-      expect(sdkError.message).toBe(
-        "Request validation failed.",
-      );
+      expect(sdkError.message).toBe("Request validation failed.");
 
       expect(sdkError.statusCode).toBe(400);
     }
@@ -177,13 +158,8 @@ test("throws PersistaSDKError for failed requests", async () => {
 test("sends an update request", async () => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = (async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ) => {
-    expect(input).toBe(
-      "http://localhost:3000/memories/memory-1",
-    );
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    expect(input).toBe("http://localhost:3000/memories/memory-1");
 
     expect(init?.method).toBe("PUT");
 
@@ -200,15 +176,12 @@ test("sends an update request", async () => {
       }),
     );
 
-    return new Response(
-      JSON.stringify({}),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    });
   }) as typeof fetch;
 
   try {
@@ -229,13 +202,8 @@ test("sends an update request", async () => {
 test("sends a delete request", async () => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = (async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ) => {
-    expect(input).toBe(
-      "http://localhost:3000/memories/memory-1",
-    );
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    expect(input).toBe("http://localhost:3000/memories/memory-1");
 
     expect(init?.method).toBe("DELETE");
 
@@ -245,15 +213,12 @@ test("sends a delete request", async () => {
 
     expect(init?.body).toBeUndefined();
 
-    return new Response(
-      JSON.stringify({}),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    });
   }) as typeof fetch;
 
   try {
@@ -268,13 +233,8 @@ test("sends a delete request", async () => {
 test("sends api key and custom headers", async () => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = (async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ) => {
-    expect(input).toBe(
-      "https://api.example.com/memories",
-    );
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    expect(input).toBe("https://api.example.com/memories");
 
     expect(init?.headers).toEqual({
       "Content-Type": "application/json",
@@ -282,15 +242,12 @@ test("sends api key and custom headers", async () => {
       Authorization: "Bearer test-key",
     });
 
-    return new Response(
-      JSON.stringify({}),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    });
   }) as typeof fetch;
 
   try {
@@ -313,22 +270,11 @@ test("sends api key and custom headers", async () => {
 test("throws an error when request times out", async () => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = (async (
-    _input: RequestInfo | URL,
-    init?: RequestInit,
-  ) => {
+  globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
     return new Promise<Response>((_, reject) => {
-      init?.signal?.addEventListener(
-        "abort",
-        () => {
-          reject(
-            new DOMException(
-              "The operation was aborted.",
-              "AbortError",
-            ),
-          );
-        },
-      );
+      init?.signal?.addEventListener("abort", () => {
+        reject(new DOMException("The operation was aborted.", "AbortError"));
+      });
     });
   }) as typeof fetch;
 
@@ -347,86 +293,61 @@ test("throws an error when request times out", async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
-  
 });
-it(
-  "sends a graph search request",
-  async () => {
-    const originalFetch =
-      globalThis.fetch;
+it("sends a graph search request", async () => {
+  const originalFetch = globalThis.fetch;
 
-    globalThis.fetch =
-      (async (
-        input: RequestInfo | URL,
-        options?: RequestInit,
-      ) => {
-        expect(
-          input.toString(),
-        ).toContain(
-          "/memories/graph/search",
-        );
+  globalThis.fetch = (async (
+    input: RequestInfo | URL,
+    options?: RequestInit,
+  ) => {
+    expect(input.toString()).toContain("/memories/graph/search");
 
-        expect(
-          options?.method,
-        ).toBe("POST");
+    expect(options?.method).toBe("POST");
 
-        expect(
-          options?.body,
-        ).toBe(
-          JSON.stringify({
-            entity: "CodePilot",
-          }),
-        );
+    expect(options?.body).toBe(
+      JSON.stringify({
+        entity: "CodePilot",
+      }),
+    );
 
-        return new Response(
-          JSON.stringify({
-            success: true,
-            result: {
-              entity: {
-                id: "codepilot-id",
-                name: "CodePilot",
-                type: "project",
-                metadata: {
-                  confidence: 1,
-                },
-              },
-              relationships: [],
-            },
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type":
-                "application/json",
+    return new Response(
+      JSON.stringify({
+        success: true,
+        result: {
+          entity: {
+            id: "codepilot-id",
+            name: "CodePilot",
+            type: "project",
+            metadata: {
+              confidence: 1,
             },
           },
-        );
-      }) as typeof fetch;
+          relationships: [],
+        },
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }) as typeof fetch;
 
-    try {
-      const client =
-        new PersistaClient({
-          baseUrl:
-            "http://localhost:3000",
-        });
+  try {
+    const client = new PersistaClient({
+      baseUrl: "http://localhost:3000",
+    });
 
-      const result =
-        await client.graphSearch(
-          "CodePilot",
-        );
+    const result = await client.graphSearch("CodePilot");
 
-      expect(result).not.toBeNull();
+    expect(result).not.toBeNull();
 
-      expect(
-        result!.entity.name,
-      ).toBe("CodePilot");
+    expect(result!.entity.name).toBe("CodePilot");
 
-      expect(
-        result!.entity.type,
-      ).toBe("project");
-    } finally {
-      globalThis.fetch =
-        originalFetch;
-    }
-  },
-);
+    expect(result!.entity.type).toBe("project");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
