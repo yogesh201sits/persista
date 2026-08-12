@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import type { HybridSearchOptions } from "@persista/ranking";
+import type { VectorSearchOptions } from "@persista/vector-store";
 
 import { memoryManager } from "../container";
 import { validateBody } from "../middleware";
@@ -14,24 +14,13 @@ memoriesSearch.post("/", validateBody(memorySearchRequestSchema), async (c) => {
     query: string;
     limit?: number;
     minScore?: number;
-    filter?: HybridSearchOptions["filter"];
-    graphDepth?: number;
-    vectorWeight?: number;
-    graphWeight?: number;
+    filter?: VectorSearchOptions["filter"];
   };
 
   const results = await memoryManager.search(body.query, {
     limit: body.limit ?? 10,
-
     minScore: body.minScore,
-
     filter: body.filter,
-
-    graphDepth: body.graphDepth ?? 1,
-
-    vectorWeight: body.vectorWeight,
-
-    graphWeight: body.graphWeight,
   });
 
   return c.json({

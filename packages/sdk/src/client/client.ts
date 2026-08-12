@@ -3,11 +3,10 @@ import type {
   VectorSearchFilter,
   VectorSearchResult,
 } from "@persista/vector-store";
+import type { GraphSearchResult } from "@persista/graph";
 
 import type { PersistaClientOptions } from "../config";
 import { PersistaSDKError } from "../errors";
-
-import type { GraphSearchResult } from "@persista/graph";
 
 export interface SearchOptions {
   limit?: number;
@@ -18,7 +17,12 @@ export interface SearchOptions {
 export interface UpdateMemoryInput {
   id: string;
   content: string;
-  type: "fact" | "identity" | "preference" | "goal" | "relationship";
+  type:
+    | "fact"
+    | "identity"
+    | "preference"
+    | "goal"
+    | "relationship";
   confidence: number;
   value?: string;
 }
@@ -50,20 +54,23 @@ export class PersistaClient {
     }, this.options.timeout);
 
     try {
-      const response = await fetch(`${this.options.baseUrl}${path}`, {
-        ...options,
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-          ...this.options.headers,
-          ...(this.options.apiKey
-            ? {
-                Authorization: `Bearer ${this.options.apiKey}`,
-              }
-            : {}),
-          ...options.headers,
+      const response = await fetch(
+        `${this.options.baseUrl}${path}`,
+        {
+          ...options,
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+            ...this.options.headers,
+            ...(this.options.apiKey
+              ? {
+                  Authorization: `Bearer ${this.options.apiKey}`,
+                }
+              : {}),
+            ...options.headers,
+          },
         },
-      });
+      );
 
       const data = await response.json();
 
@@ -80,19 +87,26 @@ export class PersistaClient {
         throw error;
       }
 
-      if (error instanceof DOMException && error.name === "AbortError") {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
         throw new PersistaSDKError("Request timed out.");
       }
 
       throw new PersistaSDKError(
-        error instanceof Error ? error.message : "Request failed.",
+        error instanceof Error
+          ? error.message
+          : "Request failed.",
       );
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  async remember(conversation: Conversation): Promise<void> {
+  async remember(
+    conversation: Conversation,
+  ): Promise<void> {
     await this.request("/memories", {
       method: "POST",
       body: JSON.stringify({
@@ -121,23 +135,32 @@ export class PersistaClient {
     return response.results;
   }
 
-  async update(memory: UpdateMemoryInput): Promise<void> {
-    await this.request(`/memories/${memory.id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        content: memory.content,
-        type: memory.type,
-        confidence: memory.confidence,
-        value: memory.value,
-      }),
-    });
+  async update(
+    memory: UpdateMemoryInput,
+  ): Promise<void> {
+    await this.request(
+      `/memories/${memory.id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          content: memory.content,
+          type: memory.type,
+          confidence: memory.confidence,
+          value: memory.value,
+        }),
+      },
+    );
   }
 
   async delete(id: string): Promise<void> {
-    await this.request(`/memories/${id}`, {
-      method: "DELETE",
-    });
+    await this.request(
+      `/memories/${id}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
+
   async graphSearch(
     entity: string,
     options?: GraphSearchOptions,
