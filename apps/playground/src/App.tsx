@@ -10,7 +10,10 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { PersistaClient } from "@persista/sdk";
+import {
+  PersistaClient,
+  type HybridSearchResult,
+} from "@persista/sdk";
 
 const client = new PersistaClient({
   baseUrl: "http://localhost:3000",
@@ -45,10 +48,8 @@ function App() {
 
   const [query, setQuery] = useState("");
 
-  // Store the response as formatted JSON.
-  // We don't make any assumptions about its structure.
   const [searchResponse, setSearchResponse] =
-    useState<string | null>(null);
+    useState<HybridSearchResult | null>(null);
 
   const [remembering, setRemembering] =
     useState(false);
@@ -103,41 +104,35 @@ function App() {
 
     setSearching(true);
     setSearchError("");
+    setSearchResponse(null);
 
     try {
-      const response = await client.search(
-        query.trim(),
-        {
-          limit: 10,
-        },
-      );
+      const response =
+        await client.hybridSearch(
+          query.trim(),
+          {
+            limit: 10,
+            depth: 2,
+          },
+        );
 
       console.log(
-        "Search response:",
+        "Hybrid search response:",
         response,
       );
 
-      // Show exactly what the SDK returns.
-      setSearchResponse(
-        JSON.stringify(
-          response,
-          null,
-          2,
-        ),
-      );
+      setSearchResponse(response);
     } catch (error) {
       console.error(
-        "Search failed:",
+        "Hybrid search failed:",
         error,
       );
 
       setSearchError(
         error instanceof Error
           ? error.message
-          : "Search failed.",
+          : "Hybrid search failed.",
       );
-
-      setSearchResponse(null);
     } finally {
       setSearching(false);
     }
@@ -325,11 +320,11 @@ function App() {
                 </div>
               </Panel>
 
-              {/* Search */}
+              {/* Hybrid Search */}
 
               <Panel
-                title="Search memories"
-                description="Retrieve relevant memories using semantic search."
+                title="Hybrid search"
+                description="Retrieve relevant memories using semantic vector search and graph retrieval."
               >
                 <div className="rounded-lg border border-white/10 bg-black/20 p-4">
                   <div className="text-xs text-white/30">
@@ -395,35 +390,97 @@ function App() {
               </Panel>
             </div>
 
-            {/* Raw Search Response */}
+            {/* Vector + Graph Results */}
+
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              {/* Vector */}
+
+              <Panel
+                title="Vector results"
+                description="Semantically relevant memories retrieved from the vector store."
+              >
+                {searchResponse ? (
+                  <ResultViewer
+                    value={
+                      searchResponse.vector
+                    }
+                    label="Vector retrieval"
+                    icon={
+                      <Search size={17} />
+                    }
+                  />
+                ) : (
+                  <EmptyResult
+                    icon={
+                      <Search size={22} />
+                    }
+                    title="No vector results yet."
+                    description="Run a hybrid search to retrieve semantic memories."
+                  />
+                )}
+              </Panel>
+
+              {/* Graph */}
+
+              <Panel
+                title="Graph results"
+                description="Entities and relationships retrieved from the knowledge graph."
+              >
+                {searchResponse ? (
+                  <ResultViewer
+                    value={
+                      searchResponse.graph
+                    }
+                    label="Graph retrieval"
+                    icon={
+                      <GitBranch
+                        size={17}
+                      />
+                    }
+                  />
+                ) : (
+                  <EmptyResult
+                    icon={
+                      <GitBranch
+                        size={22}
+                      />
+                    }
+                    title="No graph results yet."
+                    description="Run a hybrid search to retrieve graph context."
+                  />
+                )}
+              </Panel>
+            </div>
+
+            {/* Raw Response */}
 
             <Panel
-              title="Search response"
-              description="Raw response returned by Persista."
+              title="Hybrid search response"
+              description="Raw response returned by the Persista SDK."
               className="mt-6"
             >
               {searchResponse ? (
                 <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40">
-                  {/* JSON header */}
-
                   <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-emerald-400" />
 
                       <span className="text-xs text-white/40">
-                        JSON response
+                        Hybrid response
                       </span>
                     </div>
 
                     <span className="text-[10px] text-white/20">
-                      Persista API
+                      Persista SDK
                     </span>
                   </div>
 
-                  {/* JSON */}
-
                   <pre className="max-h-[600px] overflow-auto p-5 font-mono text-xs leading-6 text-white/70">
-                    {searchResponse}
+                    {JSON.stringify(
+                      searchResponse,
+                      null,
+                      2,
+                    )}
                   </pre>
                 </div>
               ) : (
@@ -438,8 +495,8 @@ function App() {
                   </div>
 
                   <div className="mt-1 text-xs text-white/25">
-                    Run a search to inspect the
-                    raw Persista response.
+                    Run a hybrid search to inspect
+                    vector and graph retrieval.
                   </div>
                 </div>
               )}
@@ -464,12 +521,71 @@ function App() {
 
                 <div className="mt-1 text-xs text-white/25">
                   For now, the Playground shows
-                  raw API responses.
+                  retrieval results and raw API
+                  responses.
                 </div>
               </div>
             </Panel>
           </div>
         </main>
+      </div>
+    </div>
+  );
+}
+
+function ResultViewer({
+  value,
+  label,
+  icon,
+}: {
+  value: unknown;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40">
+      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+        <div className="text-white/30">
+          {icon}
+        </div>
+
+        <span className="text-xs text-white/40">
+          {label}
+        </span>
+      </div>
+
+      <pre className="max-h-[400px] overflow-auto p-4 font-mono text-xs leading-6 text-white/65">
+        {JSON.stringify(
+          value,
+          null,
+          2,
+        )}
+      </pre>
+    </div>
+  );
+}
+
+function EmptyResult({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-lg border border-dashed border-white/10 px-6 py-10 text-center">
+      <div className="flex justify-center text-white/20">
+        {icon}
+      </div>
+
+      <div className="mt-3 text-sm text-white/40">
+        {title}
+      </div>
+
+      <div className="mt-1 text-xs text-white/25">
+        {description}
       </div>
     </div>
   );
