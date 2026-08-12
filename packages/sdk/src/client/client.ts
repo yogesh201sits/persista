@@ -31,13 +31,24 @@ export interface GraphSearchOptions {
   depth?: number;
 }
 
+export interface HybridSearchOptions extends SearchOptions {
+  depth?: number;
+  entity?: string;
+}
+
+export interface HybridSearchResult {
+  vector: VectorSearchResult[];
+  graph: GraphSearchResult | null;
+}
+
 export class PersistaClient {
   readonly options: Required<PersistaClientOptions>;
 
   constructor(options: PersistaClientOptions = {}) {
     this.options = {
       apiKey: options.apiKey ?? "",
-      baseUrl: options.baseUrl ?? "http://localhost:3000",
+      baseUrl:
+        options.baseUrl ?? "http://localhost:3000",
       timeout: options.timeout ?? 30_000,
       headers: options.headers ?? {},
     };
@@ -76,7 +87,8 @@ export class PersistaClient {
 
       if (!response.ok) {
         throw new PersistaSDKError(
-          data?.error?.message ?? "Request failed.",
+          data?.error?.message ??
+            "Request failed.",
           response.status,
         );
       }
@@ -91,7 +103,9 @@ export class PersistaClient {
         error instanceof DOMException &&
         error.name === "AbortError"
       ) {
-        throw new PersistaSDKError("Request timed out.");
+        throw new PersistaSDKError(
+          "Request timed out.",
+        );
       }
 
       throw new PersistaSDKError(
@@ -115,6 +129,9 @@ export class PersistaClient {
     });
   }
 
+  /**
+   * Vector-only semantic search.
+   */
   async search(
     query: string,
     options?: SearchOptions,
@@ -129,6 +146,31 @@ export class PersistaClient {
         limit: options?.limit,
         minScore: options?.minScore,
         filter: options?.filter,
+      }),
+    });
+
+    return response.results;
+  }
+
+  /**
+   * Hybrid search using both vector and graph retrieval.
+   */
+  async hybridSearch(
+    query: string,
+    options?: HybridSearchOptions,
+  ): Promise<HybridSearchResult> {
+    const response = await this.request<{
+      success: boolean;
+      results: HybridSearchResult;
+    }>("/memories/search/hybrid", {
+      method: "POST",
+      body: JSON.stringify({
+        query,
+        entity: options?.entity,
+        limit: options?.limit,
+        minScore: options?.minScore,
+        filter: options?.filter,
+        depth: options?.depth,
       }),
     });
 
