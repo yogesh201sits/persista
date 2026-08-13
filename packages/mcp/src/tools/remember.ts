@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { client } from "../client";
 
 const ConversationSchema = z.object({
@@ -8,24 +9,28 @@ const ConversationSchema = z.object({
 export const rememberTool = {
   name: "remember",
 
-  description: "Store a conversation in persistent memory.",
+  description:
+    "Store a conversation in persistent memory.",
 
   schema: {
     conversation: ConversationSchema,
   },
 
-  handler: async ({
-    conversation,
-  }: {
-    conversation: z.infer<typeof ConversationSchema>;
+  handler: async (args: {
+    conversation: z.infer<
+      typeof ConversationSchema
+    >;
   }) => {
-    await client.remember(conversation);
+    await client.remember(
+      args.conversation,
+    );
 
     return {
       content: [
         {
-          type: "text",
-          text: "Memory stored successfully.",
+          type: "text" as const,
+          text:
+            "Memory stored successfully.",
         },
       ],
     };

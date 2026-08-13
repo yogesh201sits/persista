@@ -11,29 +11,28 @@ export const searchTool = {
   schema: {
     query: z.string(),
     limit: z.number().optional(),
+    minScore: z.number().optional(),
   },
 
   handler: async ({
     query,
     limit,
+    minScore,
   }: {
     query: string;
     limit?: number;
+    minScore?: number;
   }) => {
-    const results =
-      await client.search(query, {
-        limit,
-      });
+    const results = await client.search(query, {
+      limit,
+      minScore,
+    });
 
     return {
       content: [
         {
-          type: "text",
-          text: JSON.stringify(
-            results,
-            null,
-            2,
-          ),
+          type: "text" as const,
+          text: JSON.stringify(results, null, 2),
         },
       ],
     };

@@ -12,32 +12,35 @@ export const recallTool = {
     query: z.string(),
     entity: z.string().optional(),
     depth: z.number().optional(),
+    limit: z.number().optional(),
+    minScore: z.number().optional(),
   },
 
   handler: async ({
     query,
     entity,
     depth,
+    limit,
+    minScore,
   }: {
     query: string;
     entity?: string;
     depth?: number;
+    limit?: number;
+    minScore?: number;
   }) => {
-    const results =
-      await client.hybridSearch(query, {
-        entity,
-        depth,
-      });
+    const results = await client.hybridSearch(query, {
+      entity,
+      depth,
+      limit,
+      minScore,
+    });
 
     return {
       content: [
         {
-          type: "text",
-          text: JSON.stringify(
-            results,
-            null,
-            2,
-          ),
+          type: "text" as const,
+          text: JSON.stringify(results, null, 2),
         },
       ],
     };
