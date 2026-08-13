@@ -199,6 +199,27 @@ The retrieval system can combine semantic and graph-based information to produce
 
 ---
 
+# MCP
+
+Persista includes an MCP (Model Context Protocol) server that exposes persistent memory as a set of tools for MCP-compatible clients.
+
+## Features
+
+* Persistent memory storage
+* Semantic search
+* Hybrid retrieval
+* Graph exploration
+
+## Available Tools
+
+* `remember`
+* `search`
+* `recall`
+* `graph`
+
+The MCP server is built on top of the Persista SDK, allowing AI agents to access long-term memory through a standardized interface.
+
+
 ## Example
 
 A conversation such as:
