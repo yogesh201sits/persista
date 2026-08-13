@@ -39,6 +39,7 @@ Extract useful persistent memories from the user's conversation.
 Rules:
 - Only extract information explicitly stated.
 - Do not invent information.
+- One text can extract multiple values so give different memory.
 - Ignore irrelevant information.
 - A sentence may produce multiple memories.
 - Confidence must be between 0 and 1.
@@ -63,7 +64,7 @@ Extract memories from these sentences:
     });
 
     const result = await structuredModel.invoke(messages);
-
+    console.log(result);
     return result.memories;
   }
 }
