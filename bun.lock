@@ -92,6 +92,16 @@
       "name": "@persista/graph",
       "version": "0.1.0",
     },
+    "packages/mcp": {
+      "name": "@persista/mcp",
+      "version": "1.0.0",
+      "bin": {
+        "persista-mcp": "./src/index.ts",
+      },
+      "dependencies": {
+        "@persista/sdk": "workspace:*",
+      },
+    },
     "packages/providers": {
       "name": "@persista/providers",
       "version": "0.1.0",
@@ -262,6 +272,8 @@
     "@persista/extractor": ["@persista/extractor@workspace:packages/extractor"],
 
     "@persista/graph": ["@persista/graph@workspace:packages/graph"],
+
+    "@persista/mcp": ["@persista/mcp@workspace:packages/mcp"],
 
     "@persista/providers": ["@persista/providers@workspace:packages/providers"],
 

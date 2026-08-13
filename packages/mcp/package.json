@@ -1,0 +1,12 @@
+{
+  "name": "@persista/mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "persista-mcp": "./src/index.ts"
+  },
+  "dependencies": {
+    "@persista/sdk": "workspace:*"
+  }
+}
