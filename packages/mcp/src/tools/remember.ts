@@ -1,21 +1,23 @@
 import { z } from "zod";
-
 import { client } from "../client";
+
+const ConversationSchema = z.object({
+  messages: z.array(z.any()),
+});
 
 export const rememberTool = {
   name: "remember",
 
-  description:
-    "Store a conversation in persistent memory.",
+  description: "Store a conversation in persistent memory.",
 
   schema: {
-    conversation: z.any(),
+    conversation: ConversationSchema,
   },
 
   handler: async ({
     conversation,
   }: {
-    conversation: unknown;
+    conversation: z.infer<typeof ConversationSchema>;
   }) => {
     await client.remember(conversation);
 
