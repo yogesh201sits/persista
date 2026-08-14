@@ -22,12 +22,13 @@ For production, use the URL where the Persista API is deployed.
 
 # API Overview
 
-| Method   | Endpoint           | Description                             |
-| -------- | ------------------ | --------------------------------------- |
-| `POST`   | `/memories`        | Store a conversation and extract memory |
-| `POST`   | `/memories/search` | Search persistent memory                |
-| `PUT`    | `/memories/:id`    | Update a memory                         |
-| `DELETE` | `/memories/:id`    | Delete a memory                         |
+| Method   | Endpoint                  | Description                               |
+| -------- | ------------------------- | ----------------------------------------- |
+| `POST`   | `/memories`               | Store a conversation and extract memory   |
+| `POST`   | `/memories/search`        | Search persistent memory                  |
+| `POST`   | `/memories/search/hybrid` | Search vector and graph memory separately |
+| `PUT`    | `/memories/:id`           | Update a memory                           |
+| `DELETE` | `/memories/:id`           | Delete a memory                           |
 
 ---
 
@@ -149,6 +150,98 @@ The search request can include optional parameters:
         "relationships": []
       }
     ]
+  }
+}
+```
+
+---
+
+# Hybrid Search
+
+Search vector memory and graph memory independently and return both results in a single response.
+
+```http id="m8p2va"
+POST /memories/search/hybrid
+Content-Type: application/json
+```
+
+### Request
+
+```json id="f4w8qt"
+{
+  "query": "What technologies does CodePilot use?",
+  "entity": "CodePilot",
+  "limit": 5,
+  "minScore": 0.5,
+  "depth": 2
+}
+```
+
+### Parameters
+
+| Parameter  | Type                   | Required | Description                      |
+| ---------- | ---------------------- | -------- | -------------------------------- |
+| `query`    | `string`               | Yes      | Semantic search query            |
+| `entity`   | `string`               | No       | Entity used for graph retrieval  |
+| `limit`    | `number`               | No       | Maximum number of vector results |
+| `minScore` | `number`               | No       | Minimum vector similarity score  |
+| `depth`    | `number`               | No       | Graph traversal depth            |
+| `filter`   | `VectorSearchFilter[]` | No       | Vector search filters            |
+
+### Graph Search Behavior
+
+When `entity` is provided:
+
+```json id="m4m7ys"
+{
+  "query": "What technologies does CodePilot use?",
+  "entity": "CodePilot"
+}
+```
+
+Persista executes:
+
+```text id="x5q7bk"
+Vector Search
+        +
+Graph Search by Entity
+```
+
+When `entity` is not provided:
+
+```json id="c2f6vd"
+{
+  "query": "What technologies does CodePilot use?"
+}
+```
+
+Persista executes:
+
+```text id="r4k8mp"
+Vector Search
+        +
+Graph Search by Query
+```
+
+### Response
+
+```json id="q8n1fa"
+{
+  "success": true,
+  "results": {
+    "vector": [
+      {
+        "id": "memory-id",
+        "score": 0.94,
+        "metadata": {
+          "content": "CodePilot uses React"
+        }
+      }
+    ],
+    "graph": {
+      "entities": [],
+      "relationships": []
+    }
   }
 }
 ```
@@ -379,6 +472,17 @@ filter
 graphDepth
 ```
 
+Hybrid search requests validate:
+
+```text id="x8d3kh"
+query
+entity
+limit
+minScore
+depth
+filter
+```
+
 Invalid requests are rejected before the underlying memory system is executed.
 
 ---
@@ -413,6 +517,18 @@ curl -X POST http://localhost:3000/memories/search \
     "query": "What frontend technologies do I prefer?",
     "limit": 10,
     "graphDepth": 2
+  }'
+```
+
+### Hybrid Search
+
+```bash id="j9p2mx"
+curl -X POST http://localhost:3000/memories/search/hybrid \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What technologies does CodePilot use?",
+    "entity": "CodePilot",
+    "depth": 2
   }'
 ```
 
@@ -463,6 +579,7 @@ Both interfaces access the same underlying memory infrastructure.
 ```text id="c9s3v4"
 POST   /memories
 POST   /memories/search
+POST   /memories/search/hybrid
 PUT    /memories/:id
 DELETE /memories/:id
 ```
@@ -485,10 +602,8 @@ API consumers do not need to know whether Persista uses Qdrant, Neo4j, Hugging F
 
 The search API exposes one unified retrieval interface rather than requiring clients to separately query vector and graph systems.
 
+The hybrid search API also allows direct access to vector and graph results when applications need more control.
+
 ## Validated Requests
 
-Requests are validated before reaching the core memory services.
-
-## Typed Contracts
-
-The API request and response structures correspond to shared TypeScript contracts used across the Persista monorepo.
+API requests are validated before reaching the memory services.
